@@ -1,0 +1,381 @@
+# AutoBuilder.ai POC Development Prompt for Replit
+
+## Project Overview
+Create a fully functional Proof of Concept (POC) for AutoBuilder.ai - an AI-powered workflow automation builder and migration tool. This should be a single-page React application that demonstrates the core value proposition through an interactive demo.
+
+## Core Features to Implement
+
+### 1. Conversational Workflow Builder
+**Chat Interface:**
+- Clean chat UI with message bubbles (user messages on right, AI on left)
+- Typing indicator animation when AI is "thinking"
+- Quick action buttons for common requests ("Build automation", "Migrate workflow", "Browse templates")
+- Chat history with ability to scroll through conversation
+- Input field with send button and Enter key support
+
+**AI Conversation Flow:**
+- Welcome message explaining the tool's capabilities
+- Step-by-step questioning to understand user needs:
+  - "What trigger do you want to use?" (email received, form submitted, etc.)
+  - "Which apps do you want to connect?" (with popular options)
+  - "What actions should happen?" (send email, create record, etc.)
+  - "Which platform do you prefer?" (Zapier, Make, n8n)
+- Context-aware follow-up questions
+- Ability to modify previous choices
+- Confirmation before generating workflow
+
+### 2. Visual Workflow Representation
+**Interactive Flowchart:**
+- Node-based visual editor showing workflow steps
+- Different node types:
+  - **Trigger nodes** (green): Email received, webhook, schedule
+  - **Action nodes** (blue): Send email, create record, API call
+  - **Logic nodes** (purple): Conditional, delay, filter
+  - **Platform nodes** (orange): Zapier, Make, n8n indicators
+- Connecting lines between nodes showing data flow
+- Hover effects showing node details
+- Zoom and pan capabilities
+- Real-time updates as user describes workflow in chat
+
+**Node Design:**
+- Icon + app logo for each integration
+- Node labels with clear action descriptions
+- Status indicators (configured, needs setup, error)
+- Connection points for linking nodes
+- Expandable details panel on click
+
+### 3. Platform Selection & Export
+**Platform Switcher:**
+- Tabbed interface or dropdown for Zapier, Make, n8n
+- Platform-specific branding and colors:
+  - **Zapier**: Orange (#FF4A00) theme
+  - **Make**: Purple (#6366F1) theme  
+  - **n8n**: Pink (#EA4B71) theme
+- Real-time workflow conversion when switching platforms
+- Platform-specific node styling and terminology
+- Export buttons for each platform's JSON format
+
+**Export Features:**
+- "Export to Zapier" button generating Zapier-compatible JSON
+- "Export to Make" button generating Make scenario JSON
+- "Export to n8n" button generating n8n workflow JSON
+- Copy to clipboard functionality
+- Download as file option
+- Preview modal showing the JSON structure
+
+### 4. Migration Demonstration
+**Migration Tool:**
+- "Import Existing Workflow" section
+- File upload area for JSON files from different platforms
+- Platform detection (auto-identify source platform)
+- Migration preview showing before/after comparison
+- Side-by-side workflow visualization
+- "Convert to [Target Platform]" buttons
+- Migration report showing:
+  - Successfully converted elements
+  - Elements requiring manual setup
+  - Compatibility warnings
+
+### 5. Template Library
+**Pre-built Templates:**
+- Grid layout of popular workflow templates
+- Categories: Marketing, Sales, Productivity, E-commerce
+- Template cards showing:
+  - Workflow name and description
+  - Apps involved (with logos)
+  - Complexity level (Beginner/Advanced)
+  - Platform compatibility badges
+- Search and filter functionality
+- "Use Template" button to load into builder
+
+**Sample Templates:**
+- "Lead Magnet to Email Sequence" (Form → Email → CRM)
+- "Customer Support Ticket Router" (Email → Slack → Helpdesk)
+- "Social Media Cross-posting" (Blog → Twitter/LinkedIn/Facebook)
+- "E-commerce Order Processing" (Store → Inventory → Shipping)
+
+## Design System & Styling
+
+### Color Scheme
+**Primary Colors:**
+- Primary Blue: #2563EB (for primary actions, links)
+- Success Green: #10B981 (for completed states, success messages)
+- Warning Orange: #F59E0B (for warnings, pending states)
+- Error Red: #EF4444 (for errors, critical actions)
+- Neutral Gray: #6B7280 (for text, secondary elements)
+
+**Background Colors:**
+- Main Background: #F8FAFC (light gray)
+- Card Background: #FFFFFF (pure white)
+- Chat Background: #F1F5F9 (slightly darker gray)
+- Code Background: #1E293B (dark for JSON preview)
+
+### Typography
+- **Headings**: Inter or Poppins (bold, modern)
+- **Body Text**: Inter or system fonts (readable, clean)
+- **Code/JSON**: Monaco, 'Courier New' (monospace)
+- **Chat Messages**: Inter (conversational feel)
+
+### Layout Structure
+```
+Header (Logo + Navigation)
+├── Main Content Area (flex layout)
+│   ├── Left Panel (Chat Interface) - 40% width
+│   │   ├── Chat Messages Area
+│   │   ├── Quick Actions
+│   │   └── Input Field
+│   ├── Center Panel (Visual Workflow) - 60% width
+│   │   ├── Platform Selector Tabs
+│   │   ├── Workflow Canvas
+│   │   └── Export Controls
+│   └── Right Panel (Templates/Migration) - Collapsible
+│       ├── Template Library
+│       └── Migration Tools
+└── Footer (Links, Status)
+```
+
+### Visual Workflow Design
+**Canvas Styling:**
+- Light grid background pattern
+- Smooth node animations (fade in, scale, position changes)
+- Curved connection lines with animated flow indicators
+- Drop shadows on nodes for depth
+- Hover states with color changes and scale effects
+
+**Node Styling:**
+- Rounded rectangles (border-radius: 12px)
+- App icons/logos prominently displayed
+- Gradient backgrounds based on node type
+- Clean typography with good contrast
+- Status indicators (colored dots or badges)
+
+## Technical Implementation Details
+
+### Tech Stack for Replit
+```javascript
+// React with hooks for state management
+import React, { useState, useEffect, useRef } from 'react';
+
+// For visual workflow canvas
+import ReactFlow, { 
+  Background, 
+  Controls, 
+  MiniMap,
+  useNodesState,
+  useEdgesState 
+} from 'reactflow';
+
+// For styling (use Tailwind or styled-components)
+import 'tailwindcss/tailwind.css';
+
+// For animations
+import { motion, AnimatePresence } from 'framer-motion';
+
+// For icons
+import { 
+  ChatBubbleLeftIcon,
+  ArrowDownTrayIcon,
+  CogIcon 
+} from '@heroicons/react/24/outline';
+```
+
+### Component Structure
+```
+src/
+├── components/
+│   ├── ChatInterface/
+│   │   ├── ChatContainer.jsx
+│   │   ├── MessageBubble.jsx
+│   │   ├── InputField.jsx
+│   │   └── QuickActions.jsx
+│   ├── WorkflowBuilder/
+│   │   ├── WorkflowCanvas.jsx
+│   │   ├── NodeTypes/
+│   │   │   ├── TriggerNode.jsx
+│   │   │   ├── ActionNode.jsx
+│   │   │   └── LogicNode.jsx
+│   │   ├── PlatformSelector.jsx
+│   │   └── ExportPanel.jsx
+│   ├── Templates/
+│   │   ├── TemplateGrid.jsx
+│   │   ├── TemplateCard.jsx
+│   │   └── TemplateModal.jsx
+│   ├── Migration/
+│   │   ├── ImportSection.jsx
+│   │   ├── MigrationPreview.jsx
+│   │   └── ConversionReport.jsx
+│   └── Common/
+│       ├── Header.jsx
+│       ├── Button.jsx
+│       └── Modal.jsx
+├── data/
+│   ├── templates.js
+│   ├── integrations.js
+│   └── sampleWorkflows.js
+├── utils/
+│   ├── workflowConverter.js
+│   ├── jsonGenerator.js
+│   └── aiSimulator.js
+└── App.jsx
+```
+
+### Sample Workflow Data Structure
+```javascript
+const sampleWorkflow = {
+  id: "workflow-1",
+  name: "Lead Magnet Automation",
+  platform: "zapier",
+  nodes: [
+    {
+      id: "trigger-1",
+      type: "trigger",
+      app: "typeform",
+      action: "form_submitted",
+      position: { x: 100, y: 100 }
+    },
+    {
+      id: "action-1", 
+      type: "action",
+      app: "mailchimp",
+      action: "add_subscriber",
+      position: { x: 300, y: 100 }
+    },
+    {
+      id: "action-2",
+      type: "action", 
+      app: "slack",
+      action: "send_message",
+      position: { x: 500, y: 100 }
+    }
+  ],
+  connections: [
+    { source: "trigger-1", target: "action-1" },
+    { source: "action-1", target: "action-2" }
+  ]
+};
+```
+
+## Interactive Demo Features
+
+### 1. Guided Tutorial
+- Welcome modal explaining the tool
+- Highlighted hotspots showing key features
+- Step-by-step walkthrough of building first automation
+- "Try it yourself" prompts encouraging interaction
+
+### 2. Realistic AI Simulation
+**Mock AI Responses:**
+```javascript
+const aiResponses = {
+  welcome: "Hi! I'm here to help you build automations. What would you like to automate today?",
+  trigger_question: "Great! What should trigger this automation? Some popular options are:",
+  platform_question: "Which platform would you like to use for this automation?",
+  confirmation: "Perfect! I'll create this workflow for you. You can see it building in real-time →"
+};
+```
+
+**Smart Response Logic:**
+- Keyword matching for user inputs
+- Context-aware follow-up questions  
+- Realistic typing delays and pauses
+- Error handling for unclear requests
+
+### 3. Live Platform Conversion
+- Instant workflow translation when switching platforms
+- Visual diff highlighting changes between platforms
+- Platform-specific terminology updates
+- Compatibility warnings for unsupported features
+
+### 4. Working JSON Export
+**Generate Real JSON:**
+```javascript
+// Zapier format example
+const zapierWorkflow = {
+  "trigger": {
+    "app": "typeform",
+    "event": "new_entry"
+  },
+  "actions": [
+    {
+      "app": "mailchimp", 
+      "action": "add_update_subscriber"
+    }
+  ]
+};
+```
+
+## User Experience Flow
+
+### Primary User Journey
+1. **Landing** → User sees clean interface with chat and empty workflow canvas
+2. **Welcome** → AI greets user and offers to build automation or migrate existing
+3. **Discovery** → AI asks clarifying questions about user's needs
+4. **Building** → Workflow appears visually as user describes requirements
+5. **Platform Selection** → User can switch between Zapier/Make/n8n views
+6. **Export** → User gets working JSON file for their chosen platform
+7. **Migration Demo** → User can upload sample workflow to see migration in action
+
+### Secondary Features
+- **Template Browsing** → Quick start with pre-built automations
+- **Migration Testing** → Upload sample files to see conversion
+- **Platform Comparison** → See same workflow across different platforms
+
+## Mock Data & Integrations
+
+### Popular Apps to Include
+**Communication:**
+- Slack, Discord, Microsoft Teams, Gmail, Outlook
+
+**CRM & Sales:** 
+- HubSpot, Salesforce, Pipedrive, Airtable
+
+**Marketing:**
+- Mailchimp, ConvertKit, Facebook Ads, Google Ads
+
+**Productivity:**
+- Google Sheets, Notion, Trello, Asana, Monday.com
+
+**E-commerce:**
+- Shopify, WooCommerce, Stripe, PayPal
+
+**Forms & Surveys:**
+- Typeform, Google Forms, JotForm
+
+### Sample Migration Files
+Provide downloadable sample JSON files from different platforms that users can upload to test migration functionality.
+
+## Performance & Polish
+
+### Animations & Micro-interactions
+- Smooth transitions between states
+- Node creation animations
+- Typing indicators in chat
+- Loading states for exports
+- Success/error feedback animations
+
+### Responsive Design
+- Mobile-friendly chat interface
+- Collapsible panels for smaller screens
+- Touch-friendly workflow canvas
+- Responsive grid layouts
+
+### Error Handling
+- Graceful AI conversation fallbacks
+- Upload error messages
+- Export failure handling
+- Network connectivity issues
+
+## Call-to-Action Integration
+
+### Lead Generation
+- Email capture before JSON export
+- "Get Early Access" buttons throughout
+- Newsletter signup for workflow templates
+- Beta program signup form
+
+### Social Proof
+- Fake user testimonials/reviews
+- Usage counters ("1,247 workflows created today")
+- Platform logos showing broad compatibility
+
+This POC should demonstrate the core value proposition while feeling polished enough to generate investor and user interest. Focus on making the AI conversation feel natural, the visual workflow builder intuitive, and the migration demo impressive.
