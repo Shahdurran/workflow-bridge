@@ -1,0 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0 0% 100%);
+  --foreground: hsl(210 25% 7.8431%);
+  --card: hsl(180 6.6667% 97.0588%);
+  --card-foreground: hsl(210 25% 7.8431%);
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(210 25% 7.8431%);
+  --primary: hsl(214.8387 87.9518% 50.5882%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(210 25% 7.8431%);
+  --secondary-foreground: hsl(0 0% 100%);
+  --muted: hsl(240 1.9608% 90%);
+  --muted-foreground: hsl(210 25% 7.8431%);
+  --accent: hsl(211.5789 51.3514% 92.7451%);
+  --accent-foreground: hsl(214.8387 87.9518% 50.5882%);
+  --destructive: hsl(356.3033 90.5579% 54.3137%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(201.4286 30.4348% 90.9804%);
+  --input: hsl(200 23.0769% 97.4510%);
+  --ring: hsl(214.8387 87.9518% 50.5882%);
+  --sidebar: hsl(180 6.6667% 97.0588%);
+  --sidebar-foreground: hsl(210 25% 7.8431%);
+  --sidebar-primary: hsl(214.8387 87.9518% 50.5882%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(211.5789 51.3514% 92.7451%);
+  --sidebar-accent-foreground: hsl(214.8387 87.9518% 50.5882%);
+  --sidebar-border: hsl(205.0000 25.0000% 90.5882%);
+  --sidebar-ring: hsl(214.8387 87.9518% 50.5882%);
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: 'Monaco', 'Courier New', monospace;
+  --radius: 0.75rem;
+
+  /* WorkflowBridge Custom Colors */
+  --zapier: hsl(13.5 100% 50%);
+  --zapier-light: hsl(13.5 100% 95%);
+  --make: hsl(238.7 71.2% 66.7%);
+  --make-light: hsl(238.7 71.2% 95%);
+  --n8n: hsl(340.4 78.6% 60.2%);
+  --n8n-light: hsl(340.4 78.6% 95%);
+  --workflow-blue: hsl(214.8387 87.9518% 50.5882%);
+}
+
+.dark {
+  --background: hsl(0 0% 0%);
+  --foreground: hsl(200 6.6667% 91.1765%);
+  --card: hsl(228 9.8039% 10%);
+  --card-foreground: hsl(0 0% 85.0980%);
+  --popover: hsl(0 0% 0%);
+  --popover-foreground: hsl(200 6.6667% 91.1765%);
+  --primary: hsl(214.8387 87.9518% 50.5882%);
+  --primary-foreground: hsl(0 0% 100%);
+  --secondary: hsl(195.0000 15.3846% 94.9020%);
+  --secondary-foreground: hsl(210 25% 7.8431%);
+  --muted: hsl(0 0% 9.4118%);
+  --muted-foreground: hsl(210 3.3898% 46.2745%);
+  --accent: hsl(205.7143 70% 7.8431%);
+  --accent-foreground: hsl(214.8387 87.9518% 50.5882%);
+  --destructive: hsl(356.3033 90.5579% 54.3137%);
+  --destructive-foreground: hsl(0 0% 100%);
+  --border: hsl(210 5.2632% 14.9020%);
+  --input: hsl(207.6923 27.6596% 18.4314%);
+  --ring: hsl(214.8387 87.9518% 50.5882%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+}
+
+@layer components {
+  .workflow-canvas {
+    background-image: radial-gradient(circle, hsl(210 40% 90%) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  .workflow-node {
+    transition: all 0.2s ease-in-out;
+  }
+
+  .workflow-node:hover {
+    transform: scale(1.05);
+  }
+
+  .platform-zapier {
+    background: linear-gradient(135deg, var(--zapier) 0%, hsl(13.5 100% 45%) 100%);
+  }
+
+  .platform-make {
+    background: linear-gradient(135deg, var(--make) 0%, hsl(238.7 71.2% 60%) 100%);
+  }
+
+  .platform-n8n {
+    background: linear-gradient(135deg, var(--n8n) 0%, hsl(340.4 78.6% 55%) 100%);
+  }
+
+  .typing-dots {
+    animation: typing 1.4s infinite ease-in-out;
+  }
+
+  .typing-dots:nth-child(1) { animation-delay: 0s; }
+  .typing-dots:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typing {
+    0%, 60%, 100% {
+      transform: translateY(0);
+      opacity: 0.4;
+    }
+    30% {
+      transform: translateY(-10px);
+      opacity: 1;
+    }
+  }
+}
