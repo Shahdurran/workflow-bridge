@@ -1,0 +1,669 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkflowBridge - AI-Powered Automation Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'zapier': '#FF4A00',
+                        'make': '#6366F1', 
+                        'n8n': '#EA4B71',
+                        'workflow-blue': '#2563EB'
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-50 font-inter">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4">
+        <div class="flex items-center justify-between max-w-7xl mx-auto">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-workflow-blue rounded-lg flex items-center justify-center">
+                    <i class="fas fa-share-alt text-white text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900">WorkflowBridge</h1>
+                    <p class="text-sm text-gray-500">AI-Powered Automation Builder</p>
+                </div>
+            </div>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#" class="text-gray-600 hover:text-gray-900 font-medium">Features</a>
+                <a href="#" class="text-gray-600 hover:text-gray-900 font-medium">Templates</a>
+                <a href="#" class="text-gray-600 hover:text-gray-900 font-medium">Pricing</a>
+                <button class="bg-workflow-blue text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                    Get Started
+                </button>
+            </nav>
+            <button class="md:hidden p-2">
+                <i class="fas fa-bars text-gray-600"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex h-screen bg-slate-50">
+        <!-- Chat Interface Panel (40%) -->
+        <div class="w-2/5 bg-white border-r border-gray-200 flex flex-col">
+            <!-- Chat Header -->
+            <div class="border-b border-gray-200 p-4 bg-gradient-to-r from-workflow-blue to-blue-600">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-robot text-white"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-white">AI Workflow Assistant</h3>
+                        <p class="text-blue-100 text-sm">Ready to build automations</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-4" id="chatMessages">
+                <!-- AI Welcome Message -->
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 bg-workflow-blue rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg rounded-tl-none p-3 max-w-sm">
+                        <p class="text-gray-800">Hi! I'm here to help you build workflow automations. What would you like to automate today?</p>
+                    </div>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <div class="flex flex-wrap gap-2 ml-11">
+                    <button class="bg-blue-50 text-workflow-blue px-3 py-2 rounded-full text-sm font-medium hover:bg-blue-100 transition-colors" onclick="selectQuickAction('build')">
+                        <i class="fas fa-plus-circle mr-1"></i>Build automation
+                    </button>
+                    <button class="bg-green-50 text-green-600 px-3 py-2 rounded-full text-sm font-medium hover:bg-green-100 transition-colors" onclick="selectQuickAction('migrate')">
+                        <i class="fas fa-exchange-alt mr-1"></i>Migrate workflow
+                    </button>
+                    <button class="bg-purple-50 text-purple-600 px-3 py-2 rounded-full text-sm font-medium hover:bg-purple-100 transition-colors" onclick="selectQuickAction('templates')">
+                        <i class="fas fa-layer-group mr-1"></i>Browse templates
+                    </button>
+                </div>
+
+                <!-- User Message (Demo) -->
+                <div class="flex items-start space-x-3 justify-end" id="userMessage" style="display: none;">
+                    <div class="bg-workflow-blue text-white rounded-lg rounded-tr-none p-3 max-w-sm">
+                        <p id="userMessageText">I want to create an automation that sends a Slack message when a new form is submitted</p>
+                    </div>
+                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-user text-gray-600 text-sm"></i>
+                    </div>
+                </div>
+
+                <!-- AI Response (Demo) -->
+                <div class="flex items-start space-x-3" id="aiResponse" style="display: none;">
+                    <div class="w-8 h-8 bg-workflow-blue rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg rounded-tl-none p-3 max-w-sm">
+                        <p class="text-gray-800">Perfect! I'll help you build that automation. Let me start by creating the workflow...</p>
+                        <div class="mt-2 space-y-2">
+                            <div class="text-sm text-gray-600">
+                                <i class="fas fa-check text-green-500 mr-1"></i>Form submission trigger
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                <i class="fas fa-check text-green-500 mr-1"></i>Slack message action
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Typing Indicator -->
+                <div class="flex items-start space-x-3" id="typingIndicator" style="display: none;">
+                    <div class="w-8 h-8 bg-workflow-blue rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div class="bg-gray-100 rounded-lg rounded-tl-none p-3">
+                        <div class="flex space-x-1">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="border-t border-gray-200 p-4">
+                <div class="flex space-x-3">
+                    <input type="text" placeholder="Describe the automation you want to build..." 
+                           class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-workflow-blue focus:border-transparent outline-none"
+                           id="chatInput">
+                    <button class="bg-workflow-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workflow Canvas Panel (60%) -->
+        <div class="flex-1 flex flex-col">
+            <!-- Platform Selector Tabs -->
+            <div class="bg-white border-b border-gray-200 p-4">
+                <div class="flex space-x-1 bg-gray-100 rounded-lg p-1 w-fit">
+                    <button class="platform-tab active bg-white text-zapier px-4 py-2 rounded-md font-medium transition-all" data-platform="zapier" onclick="switchPlatform('zapier')">
+                        <i class="fas fa-bolt mr-2"></i>Zapier
+                    </button>
+                    <button class="platform-tab text-gray-600 px-4 py-2 rounded-md font-medium hover:text-make transition-all" data-platform="make" onclick="switchPlatform('make')">
+                        <i class="fas fa-cogs mr-2"></i>Make
+                    </button>
+                    <button class="platform-tab text-gray-600 px-4 py-2 rounded-md font-medium hover:text-n8n transition-all" data-platform="n8n" onclick="switchPlatform('n8n')">
+                        <i class="fas fa-project-diagram mr-2"></i>n8n
+                    </button>
+                </div>
+            </div>
+
+            <!-- Workflow Canvas -->
+            <div class="flex-1 relative bg-gray-50 overflow-hidden" style="background-image: radial-gradient(circle, #e5e7eb 1px, transparent 1px); background-size: 20px 20px;">
+                <div id="workflowCanvas" class="absolute inset-0 p-8">
+                    <!-- Workflow nodes will be dynamically added here -->
+                    <div class="workflow-container" id="workflowContainer">
+                        <!-- Demo workflow for form → slack -->
+                        <div class="flex items-center space-x-8" id="demoWorkflow" style="display: none;">
+                            <!-- Trigger Node -->
+                            <div class="workflow-node bg-white rounded-xl shadow-lg border-2 border-green-200 p-4 w-48 text-center transform hover:scale-105 transition-transform">
+                                <div class="w-12 h-12 bg-green-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
+                                    <i class="fas fa-wpforms text-green-600 text-xl"></i>
+                                </div>
+                                <h4 class="font-semibold text-gray-900 mb-1">Form Submitted</h4>
+                                <p class="text-sm text-gray-500">Google Forms</p>
+                                <div class="mt-2">
+                                    <span class="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                                    <span class="text-xs text-green-600 ml-1">Trigger</span>
+                                </div>
+                            </div>
+
+                            <!-- Arrow -->
+                            <div class="flex items-center">
+                                <div class="w-8 h-0.5 bg-gray-400"></div>
+                                <div class="w-0 h-0 border-l-8 border-l-gray-400 border-t-4 border-t-transparent border-b-4 border-b-transparent"></div>
+                            </div>
+
+                            <!-- Action Node -->
+                            <div class="workflow-node bg-white rounded-xl shadow-lg border-2 border-blue-200 p-4 w-48 text-center transform hover:scale-105 transition-transform">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg mx-auto mb-3 flex items-center justify-center">
+                                    <i class="fab fa-slack text-blue-600 text-xl"></i>
+                                </div>
+                                <h4 class="font-semibold text-gray-900 mb-1">Send Message</h4>
+                                <p class="text-sm text-gray-500">Slack</p>
+                                <div class="mt-2">
+                                    <span class="inline-block w-2 h-2 bg-blue-500 rounded-full"></span>
+                                    <span class="text-xs text-blue-600 ml-1">Action</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Empty state -->
+                        <div class="flex items-center justify-center h-full" id="emptyState">
+                            <div class="text-center">
+                                <!-- Workflow automation illustration -->
+                                <div class="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-workflow-blue to-blue-600 rounded-full flex items-center justify-center">
+                                    <i class="fas fa-share-alt text-white text-4xl"></i>
+                                </div>
+                                <h3 class="text-xl font-semibold text-gray-900 mb-2">Start building your workflow</h3>
+                                <p class="text-gray-500 mb-4">Describe your automation in the chat and watch it come to life</p>
+                                <button class="bg-workflow-blue text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors" onclick="showDemo()">
+                                    <i class="fas fa-play mr-2"></i>See Demo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canvas Controls -->
+                <div class="absolute bottom-4 right-4 flex space-x-2">
+                    <button class="bg-white border border-gray-300 p-2 rounded-lg shadow hover:shadow-md transition-shadow">
+                        <i class="fas fa-search-plus text-gray-600"></i>
+                    </button>
+                    <button class="bg-white border border-gray-300 p-2 rounded-lg shadow hover:shadow-md transition-shadow">
+                        <i class="fas fa-search-minus text-gray-600"></i>
+                    </button>
+                    <button class="bg-white border border-gray-300 p-2 rounded-lg shadow hover:shadow-md transition-shadow">
+                        <i class="fas fa-expand text-gray-600"></i>
+                    </button>
+                </div>
+
+                <!-- Export Panel -->
+                <div class="absolute top-4 right-4 bg-white rounded-lg shadow-lg border border-gray-200 p-4 w-64" id="exportPanel" style="display: none;">
+                    <h4 class="font-semibold text-gray-900 mb-3">Export Workflow</h4>
+                    <div class="space-y-3">
+                        <button class="w-full bg-zapier text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center justify-center" id="exportZapier">
+                            <i class="fas fa-download mr-2"></i>Export to Zapier
+                        </button>
+                        <button class="w-full bg-make text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center justify-center" id="exportMake">
+                            <i class="fas fa-download mr-2"></i>Export to Make
+                        </button>
+                        <button class="w-full bg-n8n text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity flex items-center justify-center" id="exportN8n">
+                            <i class="fas fa-download mr-2"></i>Export to n8n
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel (Collapsible) -->
+        <div class="w-80 bg-white border-l border-gray-200 flex flex-col transition-all duration-300" id="rightPanel">
+            <!-- Panel Header -->
+            <div class="border-b border-gray-200 p-4 flex items-center justify-between">
+                <h3 class="font-semibold text-gray-900">Templates & Migration</h3>
+                <button class="p-1 hover:bg-gray-100 rounded" onclick="toggleRightPanel()">
+                    <i class="fas fa-chevron-right text-gray-500" id="panelToggleIcon"></i>
+                </button>
+            </div>
+
+            <!-- Panel Content -->
+            <div class="flex-1 overflow-y-auto">
+                <!-- Templates Section -->
+                <div class="p-4 border-b border-gray-200">
+                    <h4 class="font-medium text-gray-900 mb-3">Popular Templates</h4>
+                    <div class="space-y-3">
+                        <!-- Template Card 1 -->
+                        <div class="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors cursor-pointer" onclick="loadTemplate('lead-magnet')">
+                            <div class="flex items-start space-x-3">
+                                <!-- Business integration graphic representation -->
+                                <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-magnet text-white"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h5 class="font-medium text-gray-900 text-sm">Lead Magnet Automation</h5>
+                                    <p class="text-xs text-gray-500 mb-1">Form → Email → CRM</p>
+                                    <div class="flex items-center space-x-1">
+                                        <span class="inline-block w-4 h-4 bg-orange-100 rounded flex items-center justify-center">
+                                            <i class="fas fa-wpforms text-orange-600 text-xs"></i>
+                                        </span>
+                                        <span class="inline-block w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
+                                            <i class="fas fa-envelope text-blue-600 text-xs"></i>
+                                        </span>
+                                        <span class="inline-block w-4 h-4 bg-purple-100 rounded flex items-center justify-center">
+                                            <i class="fas fa-users text-purple-600 text-xs"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Template Card 2 -->
+                        <div class="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors cursor-pointer" onclick="loadTemplate('support-ticket')">
+                            <div class="flex items-start space-x-3">
+                                <!-- Tech platform representation -->
+                                <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-headset text-white"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h5 class="font-medium text-gray-900 text-sm">Support Ticket Router</h5>
+                                    <p class="text-xs text-gray-500 mb-1">Email → Slack → Helpdesk</p>
+                                    <div class="flex items-center space-x-1">
+                                        <span class="inline-block w-4 h-4 bg-red-100 rounded flex items-center justify-center">
+                                            <i class="fas fa-envelope text-red-600 text-xs"></i>
+                                        </span>
+                                        <span class="inline-block w-4 h-4 bg-green-100 rounded flex items-center justify-center">
+                                            <i class="fab fa-slack text-green-600 text-xs"></i>
+                                        </span>
+                                        <span class="inline-block w-4 h-4 bg-yellow-100 rounded flex items-center justify-center">
+                                            <i class="fas fa-ticket-alt text-yellow-600 text-xs"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Template Card 3 -->
+                        <div class="bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors cursor-pointer" onclick="loadTemplate('social-media')">
+                            <div class="flex items-start space-x-3">
+                                <!-- Social media integration graphic -->
+                                <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-share-alt text-white"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h5 class="font-medium text-gray-900 text-sm">Social Media Cross-post</h5>
+                                    <p class="text-xs text-gray-500 mb-1">Blog → Twitter/LinkedIn</p>
+                                    <div class="flex items-center space-x-1">
+                                        <span class="inline-block w-4 h-4 bg-gray-100 rounded flex items-center justify-center">
+                                            <i class="fas fa-blog text-gray-600 text-xs"></i>
+                                        </span>
+                                        <span class="inline-block w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
+                                            <i class="fab fa-twitter text-blue-600 text-xs"></i>
+                                        </span>
+                                        <span class="inline-block w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
+                                            <i class="fab fa-linkedin text-blue-600 text-xs"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Migration Section -->
+                <div class="p-4">
+                    <h4 class="font-medium text-gray-900 mb-3">Migration Tools</h4>
+                    
+                    <!-- File Upload Area -->
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center mb-4 hover:border-workflow-blue transition-colors cursor-pointer" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-cloud-upload-alt text-gray-400 text-2xl mb-2"></i>
+                        <p class="text-sm text-gray-600 mb-1">Upload existing workflow</p>
+                        <p class="text-xs text-gray-500">JSON files from any platform</p>
+                        <input type="file" id="fileInput" accept=".json" class="hidden" onchange="handleFileUpload(event)">
+                    </div>
+
+                    <!-- Sample Migration Files -->
+                    <div class="space-y-2">
+                        <p class="text-xs font-medium text-gray-700 mb-2">Try with sample files:</p>
+                        <button class="w-full text-left px-3 py-2 bg-orange-50 border border-orange-200 rounded-lg text-sm hover:bg-orange-100 transition-colors" onclick="loadSampleFile('zapier')">
+                            <i class="fas fa-file-code text-orange-600 mr-2"></i>
+                            <span class="font-medium">Zapier Sample</span>
+                            <span class="text-gray-500 text-xs block">Lead generation workflow</span>
+                        </button>
+                        <button class="w-full text-left px-3 py-2 bg-purple-50 border border-purple-200 rounded-lg text-sm hover:bg-purple-100 transition-colors" onclick="loadSampleFile('make')">
+                            <i class="fas fa-file-code text-purple-600 mr-2"></i>
+                            <span class="font-medium">Make Sample</span>
+                            <span class="text-gray-500 text-xs block">E-commerce automation</span>
+                        </button>
+                        <button class="w-full text-left px-3 py-2 bg-pink-50 border border-pink-200 rounded-lg text-sm hover:bg-pink-100 transition-colors" onclick="loadSampleFile('n8n')">
+                            <i class="fas fa-file-code text-pink-600 mr-2"></i>
+                            <span class="font-medium">n8n Sample</span>
+                            <span class="text-gray-500 text-xs block">Customer support flow</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-8">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 bg-workflow-blue rounded-lg flex items-center justify-center">
+                            <i class="fas fa-share-alt text-white"></i>
+                        </div>
+                        <span class="font-bold text-white">WorkflowBridge</span>
+                    </div>
+                    <p class="text-sm text-gray-400">Connecting workflows across all platforms with AI-powered automation.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-white mb-3">Product</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Templates</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Migration</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">API</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-white mb-3">Support</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Status</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-white mb-3">Connect</h4>
+                    <div class="flex space-x-3">
+                        <a href="#" class="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center hover:bg-gray-600 transition-colors">
+                            <i class="fab fa-twitter text-gray-300"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center hover:bg-gray-600 transition-colors">
+                            <i class="fab fa-github text-gray-300"></i>
+                        </a>
+                        <a href="#" class="w-8 h-8 bg-gray-700 rounded-lg flex items-center justify-center hover:bg-gray-600 transition-colors">
+                            <i class="fab fa-discord text-gray-300"></i>
+                        </a>
+                    </div>
+                    <div class="mt-4">
+                        <p class="text-xs text-gray-500">
+                            <i class="fas fa-circle text-green-500 mr-1"></i>
+                            All systems operational
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-4 text-center text-sm text-gray-500">
+                <p>&copy; 2024 WorkflowBridge. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        (function() {
+            let currentPlatform = 'zapier';
+            let isRightPanelCollapsed = false;
+
+            // Chat functionality
+            window.sendMessage = function() {
+                const input = document.getElementById('chatInput');
+                const message = input.value.trim();
+                if (!message) return;
+
+                // Add user message to chat
+                addUserMessage(message);
+                input.value = '';
+
+                // Show typing indicator
+                showTypingIndicator();
+
+                // Simulate AI response
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    addAIResponse(generateAIResponse(message));
+                    
+                    // Show demo workflow if appropriate
+                    if (message.toLowerCase().includes('form') && message.toLowerCase().includes('slack')) {
+                        setTimeout(() => showDemo(), 1000);
+                    }
+                }, 2000);
+            };
+
+            window.selectQuickAction = function(action) {
+                const messages = {
+                    'build': 'I want to build a new automation',
+                    'migrate': 'I need to migrate an existing workflow',
+                    'templates': 'Show me workflow templates'
+                };
+                
+                document.getElementById('chatInput').value = messages[action];
+                sendMessage();
+            };
+
+            function addUserMessage(message) {
+                const userMsg = document.getElementById('userMessage');
+                document.getElementById('userMessageText').textContent = message;
+                userMsg.style.display = 'flex';
+                userMsg.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function addAIResponse(response) {
+                const aiMsg = document.getElementById('aiResponse');
+                aiMsg.querySelector('p').textContent = response;
+                aiMsg.style.display = 'flex';
+                aiMsg.scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function showTypingIndicator() {
+                document.getElementById('typingIndicator').style.display = 'flex';
+                document.getElementById('typingIndicator').scrollIntoView({ behavior: 'smooth' });
+            }
+
+            function hideTypingIndicator() {
+                document.getElementById('typingIndicator').style.display = 'none';
+            }
+
+            function generateAIResponse(userMessage) {
+                const responses = {
+                    default: "I'll help you build that automation. Let me create the workflow for you...",
+                    form: "Perfect! I'll create a form submission automation. You can see it building on the canvas.",
+                    migrate: "I can help you migrate your existing workflow. Please upload your JSON file in the migration panel.",
+                    templates: "Here are some popular templates to get you started. Check the templates panel on the right!"
+                };
+
+                const message = userMessage.toLowerCase();
+                if (message.includes('form')) return responses.form;
+                if (message.includes('migrate')) return responses.migrate;
+                if (message.includes('template')) return responses.templates;
+                return responses.default;
+            }
+
+            // Platform switching
+            window.switchPlatform = function(platform) {
+                currentPlatform = platform;
+                
+                // Update active tab
+                document.querySelectorAll('.platform-tab').forEach(tab => {
+                    tab.classList.remove('active', 'bg-white', 'text-zapier', 'text-make', 'text-n8n');
+                    tab.classList.add('text-gray-600');
+                });
+                
+                const activeTab = document.querySelector(`[data-platform="${platform}"]`);
+                activeTab.classList.add('active', 'bg-white', `text-${platform}`);
+                activeTab.classList.remove('text-gray-600');
+
+                // Update workflow styling based on platform
+                updateWorkflowStyling(platform);
+            };
+
+            function updateWorkflowStyling(platform) {
+                const colors = {
+                    zapier: { primary: '#FF4A00', secondary: '#FFF7ED' },
+                    make: { primary: '#6366F1', secondary: '#F0F0FF' },
+                    n8n: { primary: '#EA4B71', secondary: '#FFF0F3' }
+                };
+
+                // Update node styling (simplified for demo)
+                document.querySelectorAll('.workflow-node').forEach(node => {
+                    node.style.borderColor = colors[platform].secondary;
+                });
+            }
+
+            // Demo workflow
+            window.showDemo = function() {
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('demoWorkflow').style.display = 'flex';
+                
+                // Show export panel
+                setTimeout(() => {
+                    document.getElementById('exportPanel').style.display = 'block';
+                }, 1000);
+            };
+
+            // Template loading
+            window.loadTemplate = function(templateId) {
+                console.log(`Loading template: ${templateId}`);
+                // TODO: Implement template loading logic
+                showDemo(); // For demo purposes
+            };
+
+            // File upload
+            window.handleFileUpload = function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    console.log(`Uploaded file: ${file.name}`);
+                    // TODO: Implement file processing logic
+                    alert('File uploaded successfully! Migration preview would appear here.');
+                }
+            };
+
+            window.loadSampleFile = function(platform) {
+                console.log(`Loading sample ${platform} file`);
+                // TODO: Implement sample file loading
+                alert(`Loading ${platform} sample workflow for migration demo.`);
+            };
+
+            // Right panel toggle
+            window.toggleRightPanel = function() {
+                const panel = document.getElementById('rightPanel');
+                const icon = document.getElementById('panelToggleIcon');
+                
+                isRightPanelCollapsed = !isRightPanelCollapsed;
+                
+                if (isRightPanelCollapsed) {
+                    panel.style.width = '0px';
+                    icon.classList.remove('fa-chevron-right');
+                    icon.classList.add('fa-chevron-left');
+                } else {
+                    panel.style.width = '320px';
+                    icon.classList.remove('fa-chevron-left');
+                    icon.classList.add('fa-chevron-right');
+                }
+            };
+
+            // Export functionality
+            document.getElementById('exportZapier').addEventListener('click', function() {
+                const zapierJSON = {
+                    trigger: {
+                        app: "google_forms",
+                        event: "new_response"
+                    },
+                    actions: [{
+                        app: "slack",
+                        action: "send_channel_message"
+                    }]
+                };
+                downloadJSON(zapierJSON, 'zapier-workflow.json');
+            });
+
+            document.getElementById('exportMake').addEventListener('click', function() {
+                const makeJSON = {
+                    scenario: {
+                        name: "Form to Slack",
+                        modules: [
+                            { service: "google-forms", operation: "watch-responses" },
+                            { service: "slack", operation: "create-a-message" }
+                        ]
+                    }
+                };
+                downloadJSON(makeJSON, 'make-scenario.json');
+            });
+
+            document.getElementById('exportN8n').addEventListener('click', function() {
+                const n8nJSON = {
+                    nodes: [
+                        { type: "n8n-nodes-base.googleFormsTrigger", name: "Google Forms Trigger" },
+                        { type: "n8n-nodes-base.slack", name: "Slack" }
+                    ],
+                    connections: {
+                        "Google Forms Trigger": { main: [["Slack"]] }
+                    }
+                };
+                downloadJSON(n8nJSON, 'n8n-workflow.json');
+            });
+
+            function downloadJSON(data, filename) {
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+
+            // Enter key support for chat
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            // Initialize
+            switchPlatform('zapier');
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./automation-chatbot-backend
+      dockerfile: Dockerfile
+    container_name: workflow-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+    env_file:
+      - ./automation-chatbot-backend/.env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - workflow-network
+
+  frontend:
+    build:
+      context: ./automation-chatbot-frontend
+      dockerfile: Dockerfile
+    container_name: workflow-frontend
+    ports:
+      - "80:80"
+    environment:
+      - VITE_API_BASE_URL=http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - workflow-network
+
+networks:
+  workflow-network:
+    driver: bridge
+
+volumes:
+  backend-data:
+
