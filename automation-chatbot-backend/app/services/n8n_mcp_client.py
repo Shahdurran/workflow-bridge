@@ -198,9 +198,11 @@ class N8nMcpClient:
                 headers["Authorization"] = f"Bearer {self.auth_token}"
             
             async with httpx.AsyncClient(timeout=self.timeout) as client:
-                response = await client.get(f"{self.base_url}/health", headers=headers)
+                # Try root endpoint which returns server info
+                response = await client.get(f"{self.base_url}/", headers=headers)
                 response.raise_for_status()
-                return response.json()
+                # If we get here, server is responsive
+                return {"status": "ok", "server": "n8n-mcp", "url": self.base_url}
         except Exception as e:
             logger.error(f"Health check failed: {str(e)}")
             raise HTTPException(

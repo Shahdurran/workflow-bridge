@@ -9,8 +9,8 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime
 
 from langchain_openai import ChatOpenAI
-from langchain.memory import ConversationBufferMemory
-from langchain.schema import HumanMessage, AIMessage
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.messages import HumanMessage, AIMessage
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import tiktoken
 
@@ -69,10 +69,7 @@ class AIService:
     def __init__(self):
         self.settings = get_settings()
         self.llm = self._initialize_llm()
-        self.memory = ConversationBufferMemory(
-            return_messages=True,
-            memory_key="chat_history"
-        )
+        self.memory = ChatMessageHistory()
         self.encoding = tiktoken.encoding_for_model(self.settings.openai_model)
         self.total_tokens_used = 0
         

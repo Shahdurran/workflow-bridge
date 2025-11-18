@@ -1,0 +1,44 @@
+{
+  "name": "workflow-translator",
+  "version": "1.0.0",
+  "description": "Universal Workflow Translator for n8n, Make.com, and Zapier",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "workflow-translator": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -w",
+    "start": "node dist/index.js",
+    "start:http": "MCP_MODE=http node dist/index.js",
+    "test": "vitest",
+    "test:watch": "vitest watch"
+  },
+  "keywords": [
+    "workflow",
+    "translator",
+    "n8n",
+    "make",
+    "zapier",
+    "automation",
+    "mcp"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.20.1",
+    "@anthropic-ai/sdk": "^0.32.1",
+    "axios": "^1.11.0",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.15.30",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
+  }
+}
+

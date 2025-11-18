@@ -1,0 +1,266 @@
+{
+  "priority_apps": [
+    {
+      "app_name": "HTTP",
+      "app_slug": "http",
+      "category": "HTTP & Webhooks",
+      "popularity_score": 100,
+      "modules": ["Make a request", "Make a basic auth request", "Make an OAuth request"]
+    },
+    {
+      "app_name": "Webhooks",
+      "app_slug": "gateway",
+      "category": "HTTP & Webhooks",
+      "popularity_score": 95,
+      "modules": ["Custom webhook", "Webhook response"]
+    },
+    {
+      "app_name": "Google Sheets",
+      "app_slug": "google-sheets",
+      "category": "Data & Storage",
+      "popularity_score": 90,
+      "modules": [
+        "Watch Rows",
+        "Watch New Rows",
+        "Add a Row",
+        "Update a Row",
+        "Get a Row",
+        "Delete a Row",
+        "Search Rows",
+        "Clear Values from a Range"
+      ]
+    },
+    {
+      "app_name": "Gmail",
+      "app_slug": "gmail",
+      "category": "Communication",
+      "popularity_score": 85,
+      "modules": [
+        "Watch emails",
+        "Send an Email",
+        "Get an Email",
+        "Update a Label",
+        "Create a Draft",
+        "Delete an Email"
+      ]
+    },
+    {
+      "app_name": "Slack",
+      "app_slug": "slack",
+      "category": "Communication",
+      "popularity_score": 85,
+      "modules": [
+        "Watch Public Channel Messages",
+        "Watch Private Channel Messages",
+        "Create a Message",
+        "Update a Message",
+        "Create a Channel",
+        "Add a Reaction"
+      ]
+    },
+    {
+      "app_name": "Google Drive",
+      "app_slug": "google-drive",
+      "category": "Data & Storage",
+      "popularity_score": 80,
+      "modules": [
+        "Watch Files",
+        "Upload a File",
+        "Download a File",
+        "Get a File",
+        "Create a Folder",
+        "Delete a File",
+        "Share a File"
+      ]
+    },
+    {
+      "app_name": "Airtable",
+      "app_slug": "airtable",
+      "category": "Data & Storage",
+      "popularity_score": 80,
+      "modules": [
+        "Watch Records",
+        "Create a Record",
+        "Update a Record",
+        "Get a Record",
+        "Delete a Record",
+        "Search Records"
+      ]
+    },
+    {
+      "app_name": "Google Calendar",
+      "app_slug": "google-calendar",
+      "category": "Productivity",
+      "popularity_score": 75,
+      "modules": [
+        "Watch Events",
+        "Create an Event",
+        "Update an Event",
+        "Get an Event",
+        "Delete an Event",
+        "Search Events"
+      ]
+    },
+    {
+      "app_name": "Notion",
+      "app_slug": "notion",
+      "category": "Productivity",
+      "popularity_score": 75,
+      "modules": [
+        "Watch Database Items",
+        "Create a Database Item",
+        "Update a Database Item",
+        "Get a Database Item",
+        "Search Objects"
+      ]
+    },
+    {
+      "app_name": "Microsoft Excel",
+      "app_slug": "microsoft-excel",
+      "category": "Data & Storage",
+      "popularity_score": 70,
+      "modules": [
+        "Watch Rows",
+        "Add a Row",
+        "Update a Row",
+        "Get a Row",
+        "Delete a Row"
+      ]
+    },
+    {
+      "app_name": "Microsoft Outlook",
+      "app_slug": "microsoft-outlook",
+      "category": "Communication",
+      "popularity_score": 70,
+      "modules": [
+        "Watch Events",
+        "Watch Emails",
+        "Send an Email",
+        "Create an Event",
+        "Create a Contact"
+      ]
+    },
+    {
+      "app_name": "Trello",
+      "app_slug": "trello",
+      "category": "Productivity",
+      "popularity_score": 70,
+      "modules": [
+        "Watch Cards",
+        "Create a Card",
+        "Update a Card",
+        "Get a Card",
+        "Create a Board",
+        "Add a Comment"
+      ]
+    },
+    {
+      "app_name": "HubSpot CRM",
+      "app_slug": "hubspot-crm",
+      "category": "CRM",
+      "popularity_score": 65,
+      "modules": [
+        "Watch Contacts",
+        "Watch Deals",
+        "Create a Contact",
+        "Update a Contact",
+        "Create a Deal",
+        "Create a Company"
+      ]
+    },
+    {
+      "app_name": "Salesforce",
+      "app_slug": "salesforce",
+      "category": "CRM",
+      "popularity_score": 65,
+      "modules": [
+        "Watch Records",
+        "Create a Record",
+        "Update a Record",
+        "Get a Record",
+        "Delete a Record",
+        "Search Records"
+      ]
+    },
+    {
+      "app_name": "Shopify",
+      "app_slug": "shopify",
+      "category": "E-commerce",
+      "popularity_score": 60,
+      "modules": [
+        "Watch Orders",
+        "Watch Products",
+        "Create an Order",
+        "Update an Order",
+        "Create a Product",
+        "Update a Product"
+      ]
+    },
+    {
+      "app_name": "Email",
+      "app_slug": "email",
+      "category": "Communication",
+      "popularity_score": 60,
+      "modules": [
+        "Send an Email",
+        "Watch Emails (IMAP)"
+      ]
+    },
+    {
+      "app_name": "Discord",
+      "app_slug": "discord",
+      "category": "Communication",
+      "popularity_score": 55,
+      "modules": [
+        "Watch Messages",
+        "Send a Message",
+        "Create a Channel",
+        "Add a Role to a User"
+      ]
+    },
+    {
+      "app_name": "GitHub",
+      "app_slug": "github",
+      "category": "Developer Tools",
+      "popularity_score": 55,
+      "modules": [
+        "Watch Issues",
+        "Watch Pull Requests",
+        "Create an Issue",
+        "Create a Pull Request",
+        "Create a Comment"
+      ]
+    },
+    {
+      "app_name": "GitLab",
+      "app_slug": "gitlab",
+      "category": "Developer Tools",
+      "popularity_score": 50,
+      "modules": [
+        "Watch Issues",
+        "Watch Merge Requests",
+        "Create an Issue",
+        "Create a Merge Request"
+      ]
+    },
+    {
+      "app_name": "Asana",
+      "app_slug": "asana",
+      "category": "Productivity",
+      "popularity_score": 55,
+      "modules": [
+        "Watch Tasks",
+        "Create a Task",
+        "Update a Task",
+        "Create a Project"
+      ]
+    }
+  ],
+  "metadata": {
+    "total_apps": 20,
+    "estimated_modules": 120,
+    "version": "1.0.0",
+    "last_updated": "2024-01-01"
+  }
+}
+

@@ -1,0 +1,24 @@
+{
+  "name": "Test Webhook to HTTP Scenario",
+  "flow": [
+    {
+      "id": 1,
+      "module": "gateway:CustomWebHook",
+      "version": 1,
+      "parameters": {
+        "webhookName": "Test Webhook"
+      }
+    },
+    {
+      "id": 2,
+      "module": "http:ActionSendData",
+      "version": 1,
+      "parameters": {
+        "url": "https://api.example.com/endpoint",
+        "method": "POST",
+        "body": "data from webhook"
+      }
+    }
+  ]
+}
+

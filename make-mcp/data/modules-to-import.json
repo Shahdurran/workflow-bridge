@@ -1,0 +1,262 @@
+{
+  "modules": [
+    {
+      "id": "http:ActionSendData",
+      "name": "Make a Request",
+      "app": "HTTP",
+      "type": "action",
+      "description": "Make an HTTP request to any URL",
+      "category": "HTTP & Webhooks",
+      "popularity_score": 100,
+      "parameters": [
+        {
+          "name": "url",
+          "type": "text",
+          "label": "URL",
+          "required": true,
+          "description": "The URL to send the request to"
+        },
+        {
+          "name": "method",
+          "type": "select",
+          "label": "Method",
+          "required": true,
+          "description": "HTTP method",
+          "default_value": "GET",
+          "options": [
+            {"label": "GET", "value": "GET"},
+            {"label": "POST", "value": "POST"},
+            {"label": "PUT", "value": "PUT"},
+            {"label": "PATCH", "value": "PATCH"},
+            {"label": "DELETE", "value": "DELETE"}
+          ]
+        },
+        {
+          "name": "headers",
+          "type": "array",
+          "label": "Headers",
+          "required": false,
+          "description": "Request headers"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "label": "Body",
+          "required": false,
+          "description": "Request body"
+        }
+      ],
+      "example_config": {
+        "url": "https://api.example.com/data",
+        "method": "GET",
+        "headers": [],
+        "body": ""
+      }
+    },
+    {
+      "id": "gateway:CustomWebhook",
+      "name": "Custom Webhook",
+      "app": "Webhooks",
+      "type": "trigger",
+      "description": "Trigger when a webhook receives data",
+      "category": "HTTP & Webhooks",
+      "popularity_score": 95,
+      "parameters": [
+        {
+          "name": "webhookPath",
+          "type": "text",
+          "label": "Webhook Path",
+          "required": false,
+          "description": "Custom path for the webhook (optional)"
+        }
+      ],
+      "example_config": {
+        "webhookPath": "/my-webhook"
+      }
+    },
+    {
+      "id": "google-sheets:watchRows",
+      "name": "Watch Rows",
+      "app": "Google Sheets",
+      "type": "trigger",
+      "description": "Triggers when a row is added or updated",
+      "category": "Data & Storage",
+      "popularity_score": 90,
+      "parameters": [
+        {
+          "name": "spreadsheetId",
+          "type": "text",
+          "label": "Spreadsheet ID",
+          "required": true,
+          "description": "The ID of the Google Sheets spreadsheet"
+        },
+        {
+          "name": "sheetName",
+          "type": "text",
+          "label": "Sheet Name",
+          "required": true,
+          "description": "Name of the sheet to watch"
+        },
+        {
+          "name": "limit",
+          "type": "number",
+          "label": "Limit",
+          "required": false,
+          "description": "Maximum number of rows to return",
+          "default_value": 10
+        }
+      ],
+      "example_config": {
+        "spreadsheetId": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
+        "sheetName": "Sheet1",
+        "limit": 10
+      }
+    },
+    {
+      "id": "google-sheets:addRow",
+      "name": "Add a Row",
+      "app": "Google Sheets",
+      "type": "action",
+      "description": "Adds a new row to a Google Sheets spreadsheet",
+      "category": "Data & Storage",
+      "popularity_score": 90,
+      "parameters": [
+        {
+          "name": "spreadsheetId",
+          "type": "text",
+          "label": "Spreadsheet ID",
+          "required": true,
+          "description": "The ID of the spreadsheet"
+        },
+        {
+          "name": "sheetName",
+          "type": "text",
+          "label": "Sheet Name",
+          "required": true,
+          "description": "Name of the sheet"
+        },
+        {
+          "name": "values",
+          "type": "array",
+          "label": "Values",
+          "required": true,
+          "description": "Array of values to add as a new row"
+        }
+      ],
+      "example_config": {
+        "spreadsheetId": "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms",
+        "sheetName": "Sheet1",
+        "values": ["{{1.name}}", "{{1.email}}", "{{1.phone}}"]
+      }
+    },
+    {
+      "id": "gmail:sendAnEmail",
+      "name": "Send an Email",
+      "app": "Gmail",
+      "type": "action",
+      "description": "Sends an email message",
+      "category": "Communication",
+      "popularity_score": 85,
+      "parameters": [
+        {
+          "name": "to",
+          "type": "text",
+          "label": "To",
+          "required": true,
+          "description": "Recipient email address"
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "label": "Subject",
+          "required": true,
+          "description": "Email subject"
+        },
+        {
+          "name": "html",
+          "type": "text",
+          "label": "HTML Content",
+          "required": false,
+          "description": "Email body in HTML format"
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "label": "Text Content",
+          "required": false,
+          "description": "Email body in plain text format"
+        },
+        {
+          "name": "cc",
+          "type": "text",
+          "label": "CC",
+          "required": false,
+          "description": "CC email addresses (comma-separated)"
+        },
+        {
+          "name": "bcc",
+          "type": "text",
+          "label": "BCC",
+          "required": false,
+          "description": "BCC email addresses (comma-separated)"
+        }
+      ],
+      "example_config": {
+        "to": "{{1.email}}",
+        "subject": "New row added",
+        "html": "<p>Hello {{1.name}},</p><p>A new row was added with your data.</p>"
+      }
+    },
+    {
+      "id": "slack:createMessage",
+      "name": "Create a Message",
+      "app": "Slack",
+      "type": "action",
+      "description": "Posts a message to a Slack channel",
+      "category": "Communication",
+      "popularity_score": 85,
+      "parameters": [
+        {
+          "name": "channel",
+          "type": "text",
+          "label": "Channel",
+          "required": true,
+          "description": "Slack channel ID or name"
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "label": "Message Text",
+          "required": true,
+          "description": "The message to post"
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "label": "Username",
+          "required": false,
+          "description": "Custom username for the bot"
+        },
+        {
+          "name": "icon_emoji",
+          "type": "text",
+          "label": "Icon Emoji",
+          "required": false,
+          "description": "Emoji to use as the icon"
+        }
+      ],
+      "example_config": {
+        "channel": "#general",
+        "text": "New data received: {{1.name}}",
+        "username": "Automation Bot"
+      }
+    }
+  ],
+  "metadata": {
+    "source": "Manual entry - Common Make.com modules",
+    "version": "1.0.0",
+    "date": "2024-01-15",
+    "note": "This is a starter set. Add more modules in the same format."
+  }
+}
+

@@ -1,0 +1,172 @@
+{
+  "n8n": {
+    "name": "n8n",
+    "type": "self_hosted",
+    "max_nodes": 1000,
+    "capabilities": {
+      "custom_code": true,
+      "webhooks": true,
+      "conditional_logic": true,
+      "loops": true,
+      "error_handling": true,
+      "sub_workflows": true,
+      "expressions": true,
+      "data_transformation": true,
+      "parallel_execution": true,
+      "rate_limiting": false
+    },
+    "expression_syntax": {
+      "prefix": "{{",
+      "suffix": "}}",
+      "examples": [
+        "{{$json.fieldName}}",
+        "{{$node[\"NodeName\"].json.field}}",
+        "{{$now}}"
+      ]
+    },
+    "strengths": [
+      "Open source and self-hostable",
+      "Extensive node library (500+)",
+      "Custom JavaScript/Python code",
+      "Complex workflows with loops and branches",
+      "AI nodes and LangChain integration"
+    ],
+    "limitations": [
+      "Requires hosting infrastructure",
+      "Learning curve for expressions",
+      "Some integrations may lag behind SaaS platforms"
+    ]
+  },
+  "make": {
+    "name": "Make (Integromat)",
+    "type": "cloud_saas",
+    "max_modules": 1000,
+    "capabilities": {
+      "custom_code": true,
+      "webhooks": true,
+      "conditional_logic": true,
+      "loops": true,
+      "error_handling": true,
+      "sub_scenarios": true,
+      "expressions": true,
+      "data_transformation": true,
+      "parallel_execution": true,
+      "rate_limiting": true
+    },
+    "expression_syntax": {
+      "notation": "dot_notation",
+      "examples": [
+        "{{1.fieldName}}",
+        "{{formatDate(now; \"YYYY-MM-DD\")}}",
+        "{{length(array)}}"
+      ]
+    },
+    "strengths": [
+      "Visual interface with detailed execution view",
+      "Advanced routing and filtering",
+      "Built-in data store",
+      "Excellent error handling",
+      "Strong scheduling options"
+    ],
+    "limitations": [
+      "Cloud-only (no self-hosting)",
+      "Pricing based on operations",
+      "Learning curve for complex scenarios"
+    ]
+  },
+  "zapier": {
+    "name": "Zapier",
+    "type": "cloud_saas",
+    "max_steps": 100,
+    "capabilities": {
+      "custom_code": false,
+      "webhooks": true,
+      "conditional_logic": false,
+      "loops": false,
+      "error_handling": true,
+      "sub_workflows": false,
+      "expressions": false,
+      "data_transformation": true,
+      "parallel_execution": false,
+      "rate_limiting": true
+    },
+    "expression_syntax": {
+      "notation": "dropdown_selection",
+      "examples": [
+        "Previous step output",
+        "Formatter options",
+        "Custom values only"
+      ]
+    },
+    "strengths": [
+      "Easiest to use for beginners",
+      "Largest app ecosystem (5000+)",
+      "Great for simple linear workflows",
+      "Reliable and stable",
+      "Excellent documentation"
+    ],
+    "limitations": [
+      "No custom code (without Code by Zapier)",
+      "No loops (without Looping by Zapier premium)",
+      "Limited conditional logic (filters only)",
+      "Linear workflow only (no branches)",
+      "Expensive for high volume"
+    ]
+  },
+  "translation_complexity": {
+    "n8n_to_make": {
+      "difficulty": "medium",
+      "success_rate": 85,
+      "common_issues": [
+        "Expression syntax differences",
+        "Module parameter naming",
+        "Error handling structure"
+      ]
+    },
+    "n8n_to_zapier": {
+      "difficulty": "hard",
+      "success_rate": 70,
+      "common_issues": [
+        "Loops not supported",
+        "Complex conditionals simplified to filters",
+        "Custom code nodes cannot be translated",
+        "Multiple branches converted to separate Zaps"
+      ]
+    },
+    "make_to_n8n": {
+      "difficulty": "medium",
+      "success_rate": 85,
+      "common_issues": [
+        "Expression syntax conversion",
+        "Router to IF node mapping",
+        "Data store alternatives"
+      ]
+    },
+    "make_to_zapier": {
+      "difficulty": "hard",
+      "success_rate": 70,
+      "common_issues": [
+        "Complex routing lost",
+        "Iterators cannot be translated",
+        "Error handlers simplified"
+      ]
+    },
+    "zapier_to_n8n": {
+      "difficulty": "easy",
+      "success_rate": 95,
+      "common_issues": [
+        "Simple structure, easy mapping",
+        "May benefit from n8n's advanced features"
+      ]
+    },
+    "zapier_to_make": {
+      "difficulty": "easy",
+      "success_rate": 95,
+      "common_issues": [
+        "Simple linear flow translates well",
+        "May add routers for optimization"
+      ]
+    }
+  }
+}
+

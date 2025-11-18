@@ -1,0 +1,51 @@
+{
+  "modules": [
+    {
+      "id": "YOUR_APP:YourModuleName",
+      "name": "Your Module Display Name",
+      "app": "Your App Name",
+      "type": "action",
+      "description": "What this module does - be descriptive!",
+      "category": "Choose: Core, Communication, Data & Storage, Productivity, CRM, E-commerce, Developer Tools, Marketing, Finance, AI & ML",
+      "icon_url": "https://optional-icon-url.com/icon.png",
+      "documentation_url": "https://optional-docs-url.com",
+      "is_premium": false,
+      "parameters": [
+        {
+          "name": "requiredParam",
+          "type": "text",
+          "required": true,
+          "description": "Description of what this parameter does"
+        },
+        {
+          "name": "optionalParam",
+          "type": "number",
+          "required": false,
+          "description": "Optional parameter with default",
+          "default_value": 10
+        },
+        {
+          "name": "selectParam",
+          "type": "select",
+          "required": true,
+          "description": "A dropdown selection",
+          "options": ["option1", "option2", "option3"],
+          "default_value": "option1"
+        },
+        {
+          "name": "arrayParam",
+          "type": "array",
+          "required": false,
+          "description": "An array of items"
+        },
+        {
+          "name": "booleanParam",
+          "type": "boolean",
+          "required": false,
+          "description": "A true/false flag",
+          "default_value": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "name": "Test Webhook to HTTP Scenario",
+  "flow": [
+    {
+      "id": 1,
+      "module": "gateway:CustomWebHook",
+      "version": 1,
+      "parameters": {
+        "webhookName": "Test Webhook"
+      },
+      "metadata": {
+        "designer": {
+          "x": 0,
+          "y": 0
+        }
+      },
+      "mapper": {}
+    },
+    {
+      "id": 2,
+      "module": "http:ActionSendData",
+      "version": 1,
+      "parameters": {
+        "url": "https://api.example.com/endpoint",
+        "method": "POST",
+        "body": "data from webhook"
+      },
+      "metadata": {
+        "designer": {
+          "x": 150,
+          "y": 0
+        }
+      },
+      "mapper": {
+        "url": "https://api.example.com/endpoint",
+        "method": "POST",
+        "body": "{{1.data}}"
+      }
+    }
+  ],
+  "metadata": {
+    "instant": true,
+    "version": 1,
+    "scenario": {
+      "roundtrips": 2,
+      "maxErrors": 3,
+      "autoCommit": true,
+      "autoCommitTriggerLast": true,
+      "sequential": false,
+      "slots": null,
+      "confidential": false,
+      "dataloss": false,
+      "dlq": false,
+      "freshVariables": false
+    },
+    "designer": {
+      "orphans": []
+    },
+    "zone": "eu2.make.com",
+    "notes": [],
+    "created_by": "make-mcp",
+    "created_at": "2025-11-15T20:59:03.207Z"
+  }
+}

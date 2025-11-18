@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "make-mcp": {
+      "command": "node",
+      "args": [
+        "D:\\workflow bridge\\workflow-bridge\\make-mcp\\dist\\index.js"
+      ],
+      "env": {
+        "MCP_MODE": "stdio",
+        "LOG_LEVEL": "info",
+        "MAKE_API_URL": "https://us1.make.com",
+        "MAKE_API_TOKEN": "your-make-api-token-here",
+        "MAKE_ORGANIZATION_ID": "your-org-id",
+        "MAKE_TEAM_ID": "your-team-id",
+        "WEBHOOK_SECURITY_MODE": "strict",
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}
+

@@ -1,54 +1,177 @@
 version: '3.8'
 
 services:
+  # n8n-MCP Server
+  n8n-mcp:
+    build:
+      context: ./n8n-mcp
+      dockerfile: Dockerfile
+    container_name: n8n-mcp
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - MCP_MODE=http
+      - PORT=3001
+      - LOG_LEVEL=info
+      - N8N_HOST=${N8N_HOST:-http://localhost:5678}
+      - N8N_API_KEY=${N8N_API_KEY}
+    volumes:
+      - n8n-mcp-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - workflow-bridge
+
+  # Make-MCP Server
+  make-mcp:
+    build:
+      context: ./make-mcp
+      dockerfile: Dockerfile
+    container_name: make-mcp
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - MCP_MODE=http
+      - PORT=3002
+      - LOG_LEVEL=info
+    volumes:
+      - make-mcp-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - workflow-bridge
+
+  # Workflow Translator
+  workflow-translator:
+    build:
+      context: ./workflow-translator
+      dockerfile: Dockerfile
+    container_name: workflow-translator
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=production
+      - MCP_MODE=http
+      - PORT=3003
+      - LOG_LEVEL=info
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - N8N_MCP_URL=http://n8n-mcp:3001
+      - MAKE_MCP_URL=http://make-mcp:3002
+    depends_on:
+      n8n-mcp:
+        condition: service_healthy
+      make-mcp:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - workflow-bridge
+
+  # Python Backend API
   backend:
     build:
       context: ./automation-chatbot-backend
       dockerfile: Dockerfile
-    container_name: workflow-backend
+    container_name: automation-chatbot-backend
     ports:
       - "8000:8000"
     environment:
       - ENVIRONMENT=production
       - DEBUG=false
-      - LOG_LEVEL=INFO
-    env_file:
-      - ./automation-chatbot-backend/.env
-    restart: unless-stopped
+      - LOG_LEVEL=info
+      
+      # Database
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      
+      # AI Services
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4-turbo-preview}
+      - CLAUDE_MODEL=${CLAUDE_MODEL:-claude-sonnet-4-20250514}
+      
+      # MCP Services
+      - N8N_MCP_URL=http://n8n-mcp:3001
+      - MAKE_MCP_URL=http://make-mcp:3002
+      - WORKFLOW_TRANSLATOR_URL=http://workflow-translator:3003
+      
+      # n8n Instance
+      - N8N_HOST=${N8N_HOST:-http://localhost:5678}
+      - N8N_API_KEY=${N8N_API_KEY}
+      
+      # JWT
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      
+      # CORS
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      
+    depends_on:
+      n8n-mcp:
+        condition: service_healthy
+      make-mcp:
+        condition: service_healthy
+      workflow-translator:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
+    restart: unless-stopped
     networks:
-      - workflow-network
+      - workflow-bridge
 
+  # React Frontend
   frontend:
     build:
       context: ./automation-chatbot-frontend
       dockerfile: Dockerfile
-    container_name: workflow-frontend
+    container_name: automation-chatbot-frontend
     ports:
-      - "80:80"
+      - "3000:3000"
     environment:
-      - VITE_API_BASE_URL=http://backend:8000
+      - VITE_API_BASE_URL=http://localhost:8000
+      - VITE_WS_URL=ws://localhost:8000/ws
     depends_on:
       backend:
         condition: service_healthy
-    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
       interval: 30s
-      timeout: 5s
+      timeout: 10s
       retries: 3
+      start_period: 40s
+    restart: unless-stopped
     networks:
-      - workflow-network
-
-networks:
-  workflow-network:
-    driver: bridge
+      - workflow-bridge
 
 volumes:
-  backend-data:
+  n8n-mcp-data:
+    driver: local
+  make-mcp-data:
+    driver: local
 
+networks:
+  workflow-bridge:
+    driver: bridge

@@ -6,7 +6,7 @@ import os
 import logging
 from datetime import datetime
 
-from app.api.routes import chat, workflow, platforms, feedback
+from app.api.routes import chat, workflow, platforms, feedback, translation
 from app.api.routes import n8n_chat
 from app.services.supabase_client import get_supabase_client
 from app.services.n8n_mcp_client import get_mcp_client
@@ -70,6 +70,7 @@ app.include_router(n8n_chat.router, prefix="/api/n8n", tags=["n8n-chat"])
 app.include_router(workflow.router, prefix="/api/workflow", tags=["workflow"])
 app.include_router(platforms.router, prefix="/api/platforms", tags=["platforms"])
 app.include_router(feedback.router, prefix="/api/feedback", tags=["feedback"])
+app.include_router(translation.router, tags=["translation"])  # Translation routes have prefix in router definition
 
 @app.get("/")
 async def root():

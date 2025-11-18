@@ -1,0 +1,1943 @@
+{
+  "modules": [
+    {
+      "id": "builtin:BasicRouter",
+      "name": "Router",
+      "app": "Flow Control",
+      "type": "router",
+      "description": "Splits the flow into multiple routes based on conditions",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "routes",
+          "type": "array",
+          "required": true,
+          "description": "Array of route configurations with conditions"
+        }
+      ]
+    },
+    {
+      "id": "http:ActionSendDataBasicAuth",
+      "name": "Make a Request (Basic Auth)",
+      "app": "HTTP",
+      "type": "action",
+      "description": "Makes an HTTP request with Basic Authentication",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "url",
+          "type": "text",
+          "required": true,
+          "description": "The URL to make the request to"
+        },
+        {
+          "name": "method",
+          "type": "select",
+          "required": true,
+          "description": "HTTP method",
+          "options": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "required": true,
+          "description": "Basic auth username"
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "required": true,
+          "description": "Basic auth password"
+        },
+        {
+          "name": "headers",
+          "type": "array",
+          "required": false,
+          "description": "HTTP headers"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": false,
+          "description": "Request body"
+        }
+      ]
+    },
+    {
+      "id": "builtin:BasicFeeder",
+      "name": "Iterator",
+      "app": "Flow Control",
+      "type": "iterator",
+      "description": "Splits an array into individual bundles for processing",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "array",
+          "type": "array",
+          "required": true,
+          "description": "Array to iterate over"
+        }
+      ]
+    },
+    {
+      "id": "util:GetVariables",
+      "name": "Get Variables",
+      "app": "Utilities",
+      "type": "action",
+      "description": "Retrieves stored variables from the scenario",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "variableNames",
+          "type": "array",
+          "required": false,
+          "description": "Names of variables to retrieve"
+        }
+      ]
+    },
+    {
+      "id": "util:SetVariables",
+      "name": "Set Variables",
+      "app": "Utilities",
+      "type": "action",
+      "description": "Stores variables for use across the scenario",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "variables",
+          "type": "array",
+          "required": true,
+          "description": "Array of variable name-value pairs to store"
+        }
+      ]
+    },
+    {
+      "id": "util:FunctionSleep",
+      "name": "Sleep",
+      "app": "Utilities",
+      "type": "action",
+      "description": "Pauses execution for a specified duration",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "delay",
+          "type": "number",
+          "required": true,
+          "description": "Delay time in milliseconds"
+        }
+      ]
+    },
+    {
+      "id": "json:CreateJSON",
+      "name": "Create JSON",
+      "app": "JSON",
+      "type": "transformer",
+      "description": "Creates JSON structure from data",
+      "category": "Data Transformation",
+      "parameters": [
+        {
+          "name": "structure",
+          "type": "object",
+          "required": true,
+          "description": "JSON structure definition"
+        }
+      ]
+    },
+    {
+      "id": "json:ParseJSON",
+      "name": "Parse JSON",
+      "app": "JSON",
+      "type": "transformer",
+      "description": "Parses JSON string into structured data",
+      "category": "Data Transformation",
+      "parameters": [
+        {
+          "name": "jsonString",
+          "type": "text",
+          "required": true,
+          "description": "JSON string to parse"
+        }
+      ]
+    },
+    {
+      "id": "xml:TransformToXML",
+      "name": "Transform to XML",
+      "app": "XML",
+      "type": "transformer",
+      "description": "Converts data to XML format",
+      "category": "Data Transformation",
+      "parameters": [
+        {
+          "name": "data",
+          "type": "object",
+          "required": true,
+          "description": "Data to convert to XML"
+        }
+      ]
+    },
+    {
+      "id": "xml:ParseXML",
+      "name": "Parse XML",
+      "app": "XML",
+      "type": "transformer",
+      "description": "Parses XML string into structured data",
+      "category": "Data Transformation",
+      "parameters": [
+        {
+          "name": "xmlString",
+          "type": "text",
+          "required": true,
+          "description": "XML string to parse"
+        }
+      ]
+    },
+    {
+      "id": "csv:ParseCSV",
+      "name": "Parse CSV",
+      "app": "CSV",
+      "type": "transformer",
+      "description": "Parses CSV data into structured format",
+      "category": "Data Transformation",
+      "parameters": [
+        {
+          "name": "csvData",
+          "type": "text",
+          "required": true,
+          "description": "CSV string to parse"
+        },
+        {
+          "name": "delimiter",
+          "type": "text",
+          "required": false,
+          "description": "CSV delimiter character"
+        }
+      ]
+    },
+    {
+      "id": "regexp:GetElementsFromText",
+      "name": "Get Elements from Text",
+      "app": "Regular Expressions",
+      "type": "transformer",
+      "description": "Extracts elements from text using regular expressions",
+      "category": "Data Transformation",
+      "parameters": [
+        {
+          "name": "text",
+          "type": "text",
+          "required": true,
+          "description": "Text to search in"
+        },
+        {
+          "name": "pattern",
+          "type": "text",
+          "required": true,
+          "description": "Regular expression pattern"
+        }
+      ]
+    },
+    {
+      "id": "regexp:Parser",
+      "name": "Regex Parser",
+      "app": "Regular Expressions",
+      "type": "transformer",
+      "description": "Parses text using regular expressions with advanced options",
+      "category": "Data Transformation",
+      "parameters": [
+        {
+          "name": "text",
+          "type": "text",
+          "required": true,
+          "description": "Text to parse"
+        },
+        {
+          "name": "patterns",
+          "type": "array",
+          "required": true,
+          "description": "Array of regex patterns to apply"
+        }
+      ]
+    },
+    {
+      "id": "google-sheets:performFunction",
+      "name": "Perform Function",
+      "app": "Google Sheets",
+      "type": "action",
+      "description": "Performs spreadsheet functions in Google Sheets",
+      "category": "Productivity",
+      "parameters": [
+        {
+          "name": "spreadsheetId",
+          "type": "text",
+          "required": true,
+          "description": "Google Sheets spreadsheet ID"
+        },
+        {
+          "name": "function",
+          "type": "text",
+          "required": true,
+          "description": "Spreadsheet function to perform"
+        }
+      ]
+    },
+    {
+      "id": "google-sheets:createSpreadsheet",
+      "name": "Create Spreadsheet",
+      "app": "Google Sheets",
+      "type": "action",
+      "description": "Creates a new Google Sheets spreadsheet",
+      "category": "Productivity",
+      "parameters": [
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "description": "Title of the new spreadsheet"
+        }
+      ]
+    },
+    {
+      "id": "google-sheets:addMultipleRows",
+      "name": "Add Multiple Rows",
+      "app": "Google Sheets",
+      "type": "action",
+      "description": "Adds multiple rows to Google Sheets",
+      "category": "Productivity",
+      "parameters": [
+        {
+          "name": "spreadsheetId",
+          "type": "text",
+          "required": true,
+          "description": "Google Sheets spreadsheet ID"
+        },
+        {
+          "name": "sheetName",
+          "type": "text",
+          "required": true,
+          "description": "Name of the sheet to add rows to"
+        },
+        {
+          "name": "rows",
+          "type": "array",
+          "required": true,
+          "description": "Array of rows to add"
+        }
+      ]
+    },
+    {
+      "id": "google-sheets:updateMultipleRows",
+      "name": "Update Multiple Rows",
+      "app": "Google Sheets",
+      "type": "action",
+      "description": "Updates multiple rows in Google Sheets",
+      "category": "Productivity",
+      "parameters": [
+        {
+          "name": "spreadsheetId",
+          "type": "text",
+          "required": true,
+          "description": "Google Sheets spreadsheet ID"
+        },
+        {
+          "name": "sheetName",
+          "type": "text",
+          "required": true,
+          "description": "Name of the sheet to update"
+        },
+        {
+          "name": "updates",
+          "type": "array",
+          "required": true,
+          "description": "Array of row updates"
+        }
+      ]
+    },
+    {
+      "id": "google-sheets:makeAPICall",
+      "name": "Make API Call",
+      "app": "Google Sheets",
+      "type": "action",
+      "description": "Makes custom API calls to Google Sheets",
+      "category": "Productivity",
+      "parameters": [
+        {
+          "name": "apiCall",
+          "type": "object",
+          "required": true,
+          "description": "API call configuration"
+        }
+      ]
+    },
+    {
+      "id": "airtable:bulkCreateRecords",
+      "name": "Bulk Create Records",
+      "app": "Airtable",
+      "type": "action",
+      "description": "Creates multiple records in Airtable",
+      "category": "Productivity",
+      "parameters": [
+        {
+          "name": "baseId",
+          "type": "text",
+          "required": true,
+          "description": "Airtable base ID"
+        },
+        {
+          "name": "tableName",
+          "type": "text",
+          "required": true,
+          "description": "Airtable table name"
+        },
+        {
+          "name": "records",
+          "type": "array",
+          "required": true,
+          "description": "Array of records to create"
+        }
+      ]
+    },
+    {
+      "id": "airtable:bulkUpdateRecords",
+      "name": "Bulk Update Records",
+      "app": "Airtable",
+      "type": "action",
+      "description": "Updates multiple records in Airtable",
+      "category": "Productivity",
+      "parameters": [
+        {
+          "name": "baseId",
+          "type": "text",
+          "required": true,
+          "description": "Airtable base ID"
+        },
+        {
+          "name": "tableName",
+          "type": "text",
+          "required": true,
+          "description": "Airtable table name"
+        },
+        {
+          "name": "records",
+          "type": "array",
+          "required": true,
+          "description": "Array of records to update"
+        }
+      ]
+    },
+    {
+      "id": "airtable:bulkUpsertRecords",
+      "name": "Bulk Upsert Records",
+      "app": "Airtable",
+      "type": "action",
+      "description": "Upserts multiple records in Airtable",
+      "category": "Productivity",
+      "parameters": [
+        {
+          "name": "baseId",
+          "type": "text",
+          "required": true,
+          "description": "Airtable base ID"
+        },
+        {
+          "name": "tableName",
+          "type": "text",
+          "required": true,
+          "description": "Airtable table name"
+        },
+        {
+          "name": "records",
+          "type": "array",
+          "required": true,
+          "description": "Array of records to upsert"
+        }
+      ]
+    },
+    {
+      "id": "airtable:bulkDeleteRecords",
+      "name": "Bulk Delete Records",
+      "app": "Airtable",
+      "type": "action",
+      "description": "Deletes multiple records from Airtable",
+      "category": "Productivity",
+      "parameters": [
+        {
+          "name": "baseId",
+          "type": "text",
+          "required": true,
+          "description": "Airtable base ID"
+        },
+        {
+          "name": "tableName",
+          "type": "text",
+          "required": true,
+          "description": "Airtable table name"
+        },
+        {
+          "name": "recordIds",
+          "type": "array",
+          "required": true,
+          "description": "Array of record IDs to delete"
+        }
+      ]
+    },
+    {
+      "id": "mysql:DeleteFromTable",
+      "name": "Delete from Table",
+      "app": "MySQL",
+      "type": "action",
+      "description": "Deletes records from MySQL table",
+      "category": "Database",
+      "parameters": [
+        {
+          "name": "table",
+          "type": "text",
+          "required": true,
+          "description": "Table name"
+        },
+        {
+          "name": "where",
+          "type": "object",
+          "required": false,
+          "description": "WHERE conditions for deletion"
+        }
+      ]
+    },
+    {
+      "id": "mysql:Query",
+      "name": "Query",
+      "app": "MySQL",
+      "type": "action",
+      "description": "Executes SQL query on MySQL database",
+      "category": "Database",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "text",
+          "required": true,
+          "description": "SQL query to execute"
+        }
+      ]
+    },
+    {
+      "id": "mysql:StoredProcedure",
+      "name": "Stored Procedure",
+      "app": "MySQL",
+      "type": "action",
+      "description": "Executes stored procedure in MySQL",
+      "category": "Database",
+      "parameters": [
+        {
+          "name": "procedure",
+          "type": "text",
+          "required": true,
+          "description": "Stored procedure name"
+        },
+        {
+          "name": "parameters",
+          "type": "array",
+          "required": false,
+          "description": "Procedure parameters"
+        }
+      ]
+    },
+    {
+      "id": "mysql:InsertIntoTable",
+      "name": "Insert into Table",
+      "app": "MySQL",
+      "type": "action",
+      "description": "Inserts records into MySQL table",
+      "category": "Database",
+      "parameters": [
+        {
+          "name": "table",
+          "type": "text",
+          "required": true,
+          "description": "Table name"
+        },
+        {
+          "name": "values",
+          "type": "object",
+          "required": true,
+          "description": "Values to insert"
+        }
+      ]
+    },
+    {
+      "id": "mysql:UpdateTable",
+      "name": "Update Table",
+      "app": "MySQL",
+      "type": "action",
+      "description": "Updates records in MySQL table",
+      "category": "Database",
+      "parameters": [
+        {
+          "name": "table",
+          "type": "text",
+          "required": true,
+          "description": "Table name"
+        },
+        {
+          "name": "updates",
+          "type": "object",
+          "required": true,
+          "description": "Update values"
+        },
+        {
+          "name": "where",
+          "type": "object",
+          "required": false,
+          "description": "WHERE conditions"
+        }
+      ]
+    },
+    {
+      "id": "mysql:FeedRecordset",
+      "name": "Feed Recordset",
+      "app": "MySQL",
+      "type": "transformer",
+      "description": "Transforms data for MySQL operations",
+      "category": "Database",
+      "parameters": [
+        {
+          "name": "data",
+          "type": "array",
+          "required": true,
+          "description": "Data to transform"
+        }
+      ]
+    },
+    {
+      "id": "postgres:StoredProcedure",
+      "name": "Stored Procedure",
+      "app": "PostgreSQL",
+      "type": "action",
+      "description": "Executes stored procedure in PostgreSQL",
+      "category": "Database",
+      "parameters": [
+        {
+          "name": "procedure",
+          "type": "text",
+          "required": true,
+          "description": "Stored procedure name"
+        },
+        {
+          "name": "parameters",
+          "type": "array",
+          "required": false,
+          "description": "Procedure parameters"
+        }
+      ]
+    },
+    {
+      "id": "postgres:Query",
+      "name": "Query",
+      "app": "PostgreSQL",
+      "type": "action",
+      "description": "Executes SQL query on PostgreSQL database",
+      "category": "Database",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "text",
+          "required": true,
+          "description": "SQL query to execute"
+        }
+      ]
+    },
+    {
+      "id": "postgres:InsertIntoTable",
+      "name": "Insert into Table",
+      "app": "PostgreSQL",
+      "type": "action",
+      "description": "Inserts records into PostgreSQL table",
+      "category": "Database",
+      "parameters": [
+        {
+          "name": "table",
+          "type": "text",
+          "required": true,
+          "description": "Table name"
+        },
+        {
+          "name": "values",
+          "type": "object",
+          "required": true,
+          "description": "Values to insert"
+        }
+      ]
+    },
+    {
+      "id": "postgres:UpdateTable",
+      "name": "Update Table",
+      "app": "PostgreSQL",
+      "type": "action",
+      "description": "Updates records in PostgreSQL table",
+      "category": "Database",
+      "parameters": [
+        {
+          "name": "table",
+          "type": "text",
+          "required": true,
+          "description": "Table name"
+        },
+        {
+          "name": "updates",
+          "type": "object",
+          "required": true,
+          "description": "Update values"
+        },
+        {
+          "name": "where",
+          "type": "object",
+          "required": false,
+          "description": "WHERE conditions"
+        }
+      ]
+    },
+    {
+      "id": "postgres:SelectFromTable",
+      "name": "Select from Table",
+      "app": "PostgreSQL",
+      "type": "action",
+      "description": "Selects records from PostgreSQL table",
+      "category": "Database",
+      "parameters": [
+        {
+          "name": "table",
+          "type": "text",
+          "required": true,
+          "description": "Table name"
+        },
+        {
+          "name": "columns",
+          "type": "array",
+          "required": false,
+          "description": "Columns to select"
+        },
+        {
+          "name": "where",
+          "type": "object",
+          "required": false,
+          "description": "WHERE conditions"
+        }
+      ]
+    },
+    {
+      "id": "google-drive:createAFolder",
+      "name": "Create a Folder",
+      "app": "Google Drive",
+      "type": "action",
+      "description": "Creates a new folder in Google Drive",
+      "category": "Cloud Storage",
+      "parameters": [
+        {
+          "name": "folderName",
+          "type": "text",
+          "required": true,
+          "description": "Name of the folder to create"
+        },
+        {
+          "name": "parentFolder",
+          "type": "text",
+          "required": false,
+          "description": "Parent folder ID"
+        }
+      ]
+    },
+    {
+      "id": "google-drive:uploadAFile",
+      "name": "Upload a File",
+      "app": "Google Drive",
+      "type": "action",
+      "description": "Uploads a file to Google Drive",
+      "category": "Cloud Storage",
+      "parameters": [
+        {
+          "name": "file",
+          "type": "file",
+          "required": true,
+          "description": "File to upload"
+        },
+        {
+          "name": "fileName",
+          "type": "text",
+          "required": true,
+          "description": "Name for the uploaded file"
+        },
+        {
+          "name": "folder",
+          "type": "text",
+          "required": false,
+          "description": "Folder ID to upload to"
+        }
+      ]
+    },
+    {
+      "id": "google-drive:updateAFile",
+      "name": "Update a File",
+      "app": "Google Drive",
+      "type": "action",
+      "description": "Updates an existing file in Google Drive",
+      "category": "Cloud Storage",
+      "parameters": [
+        {
+          "name": "fileId",
+          "type": "text",
+          "required": true,
+          "description": "ID of the file to update"
+        },
+        {
+          "name": "file",
+          "type": "file",
+          "required": true,
+          "description": "Updated file content"
+        }
+      ]
+    },
+    {
+      "id": "google-drive:makeApiCall",
+      "name": "Make API Call",
+      "app": "Google Drive",
+      "type": "action",
+      "description": "Makes custom API calls to Google Drive",
+      "category": "Cloud Storage",
+      "parameters": [
+        {
+          "name": "apiCall",
+          "type": "object",
+          "required": true,
+          "description": "API call configuration"
+        }
+      ]
+    },
+    {
+      "id": "dropbox:searchFilesFolders",
+      "name": "Search Files/Folders",
+      "app": "Dropbox",
+      "type": "action",
+      "description": "Searches for files and folders in Dropbox",
+      "category": "Cloud Storage",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "text",
+          "required": true,
+          "description": "Search query"
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "required": false,
+          "description": "Path to search in"
+        }
+      ]
+    },
+    {
+      "id": "dropbox:uploadLargeFile",
+      "name": "Upload Large File",
+      "app": "Dropbox",
+      "type": "action",
+      "description": "Uploads large files to Dropbox with chunking",
+      "category": "Cloud Storage",
+      "parameters": [
+        {
+          "name": "file",
+          "type": "file",
+          "required": true,
+          "description": "File to upload"
+        },
+        {
+          "name": "path",
+          "type": "text",
+          "required": true,
+          "description": "Dropbox path for the file"
+        }
+      ]
+    },
+    {
+      "id": "dropbox:createFolder",
+      "name": "Create Folder",
+      "app": "Dropbox",
+      "type": "action",
+      "description": "Creates a new folder in Dropbox",
+      "category": "Cloud Storage",
+      "parameters": [
+        {
+          "name": "path",
+          "type": "text",
+          "required": true,
+          "description": "Path for the new folder"
+        }
+      ]
+    },
+    {
+      "id": "dropbox:makeApiCall",
+      "name": "Make API Call",
+      "app": "Dropbox",
+      "type": "action",
+      "description": "Makes custom API calls to Dropbox",
+      "category": "Cloud Storage",
+      "parameters": [
+        {
+          "name": "apiCall",
+          "type": "object",
+          "required": true,
+          "description": "API call configuration"
+        }
+      ]
+    },
+    {
+      "id": "onedrive:searchFilesFolders",
+      "name": "Search Files/Folders",
+      "app": "OneDrive",
+      "type": "action",
+      "description": "Searches for files and folders in OneDrive",
+      "category": "Cloud Storage",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "text",
+          "required": true,
+          "description": "Search query"
+        }
+      ]
+    },
+    {
+      "id": "onedrive:makeApiCall",
+      "name": "Make API Call",
+      "app": "OneDrive",
+      "type": "action",
+      "description": "Makes custom API calls to OneDrive",
+      "category": "Cloud Storage",
+      "parameters": [
+        {
+          "name": "apiCall",
+          "type": "object",
+          "required": true,
+          "description": "API call configuration"
+        }
+      ]
+    },
+    {
+      "id": "email:ActionCreateDraft",
+      "name": "Create Draft",
+      "app": "Email",
+      "type": "action",
+      "description": "Creates an email draft",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "to",
+          "type": "array",
+          "required": true,
+          "description": "Recipient email addresses"
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "required": true,
+          "description": "Email subject"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": true,
+          "description": "Email body"
+        }
+      ]
+    },
+    {
+      "id": "email:FeedAttachments",
+      "name": "Feed Attachments",
+      "app": "Email",
+      "type": "transformer",
+      "description": "Processes email attachments",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "attachments",
+          "type": "array",
+          "required": true,
+          "description": "Email attachments to process"
+        }
+      ]
+    },
+    {
+      "id": "google-email:makeAnApiCall",
+      "name": "Make API Call",
+      "app": "Gmail",
+      "type": "action",
+      "description": "Makes custom API calls to Gmail",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "apiCall",
+          "type": "object",
+          "required": true,
+          "description": "API call configuration"
+        }
+      ]
+    },
+    {
+      "id": "google-email:sendAnEmail",
+      "name": "Send Email",
+      "app": "Gmail",
+      "type": "action",
+      "description": "Sends email through Gmail",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "to",
+          "type": "array",
+          "required": true,
+          "description": "Recipient email addresses"
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "required": true,
+          "description": "Email subject"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": true,
+          "description": "Email body"
+        }
+      ]
+    },
+    {
+      "id": "microsoft-email:createAndSendAMessage",
+      "name": "Create and Send Message",
+      "app": "Outlook",
+      "type": "action",
+      "description": "Creates and sends email through Outlook",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "to",
+          "type": "array",
+          "required": true,
+          "description": "Recipient email addresses"
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "required": true,
+          "description": "Email subject"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": true,
+          "description": "Email body"
+        }
+      ]
+    },
+    {
+      "id": "slack:WatchFiles",
+      "name": "Watch Files",
+      "app": "Slack",
+      "type": "trigger",
+      "description": "Triggers when files are uploaded to Slack",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "channel",
+          "type": "text",
+          "required": false,
+          "description": "Slack channel to watch"
+        }
+      ]
+    },
+    {
+      "id": "slack:CreateMessage",
+      "name": "Create Message",
+      "app": "Slack",
+      "type": "action",
+      "description": "Creates and sends messages in Slack",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "channel",
+          "type": "text",
+          "required": true,
+          "description": "Slack channel ID"
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "required": true,
+          "description": "Message text"
+        }
+      ]
+    },
+    {
+      "id": "slack:ListReplies",
+      "name": "List Replies",
+      "app": "Slack",
+      "type": "action",
+      "description": "Lists replies to a Slack message",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "channel",
+          "type": "text",
+          "required": true,
+          "description": "Slack channel ID"
+        },
+        {
+          "name": "timestamp",
+          "type": "text",
+          "required": true,
+          "description": "Message timestamp"
+        }
+      ]
+    },
+    {
+      "id": "slack:MakeAPICall",
+      "name": "Make API Call",
+      "app": "Slack",
+      "type": "action",
+      "description": "Makes custom API calls to Slack",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "apiCall",
+          "type": "object",
+          "required": true,
+          "description": "API call configuration"
+        }
+      ]
+    },
+    {
+      "id": "telegram:SendReplyMessage",
+      "name": "Send Reply Message",
+      "app": "Telegram",
+      "type": "action",
+      "description": "Sends reply messages in Telegram",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "chatId",
+          "type": "text",
+          "required": true,
+          "description": "Telegram chat ID"
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "required": true,
+          "description": "Message text"
+        },
+        {
+          "name": "replyToMessageId",
+          "type": "number",
+          "required": false,
+          "description": "Message ID to reply to"
+        }
+      ]
+    },
+    {
+      "id": "telegram:SendDocument",
+      "name": "Send Document",
+      "app": "Telegram",
+      "type": "action",
+      "description": "Sends documents through Telegram",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "chatId",
+          "type": "text",
+          "required": true,
+          "description": "Telegram chat ID"
+        },
+        {
+          "name": "document",
+          "type": "file",
+          "required": true,
+          "description": "Document file to send"
+        }
+      ]
+    },
+    {
+      "id": "telegram:UniversalAPICall",
+      "name": "Universal API Call",
+      "app": "Telegram",
+      "type": "action",
+      "description": "Makes custom API calls to Telegram",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "apiCall",
+          "type": "object",
+          "required": true,
+          "description": "API call configuration"
+        }
+      ]
+    },
+    {
+      "id": "discord:updateACurrentBot",
+      "name": "Update Bot",
+      "app": "Discord",
+      "type": "action",
+      "description": "Updates Discord bot settings",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "botId",
+          "type": "text",
+          "required": true,
+          "description": "Discord bot ID"
+        },
+        {
+          "name": "updates",
+          "type": "object",
+          "required": true,
+          "description": "Bot update settings"
+        }
+      ]
+    },
+    {
+      "id": "discord:MakeAPICall",
+      "name": "Make API Call",
+      "app": "Discord",
+      "type": "action",
+      "description": "Makes custom API calls to Discord",
+      "category": "Communication",
+      "parameters": [
+        {
+          "name": "apiCall",
+          "type": "object",
+          "required": true,
+          "description": "API call configuration"
+        }
+      ]
+    },
+    {
+      "id": "shopify:searchProducts",
+      "name": "Search Products",
+      "app": "Shopify",
+      "type": "action",
+      "description": "Searches products in Shopify store",
+      "category": "E-commerce",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "text",
+          "required": true,
+          "description": "Search query"
+        },
+        {
+          "name": "limit",
+          "type": "number",
+          "required": false,
+          "description": "Result limit"
+        }
+      ]
+    },
+    {
+      "id": "shopify:createProduct",
+      "name": "Create Product",
+      "app": "Shopify",
+      "type": "action",
+      "description": "Creates new products in Shopify",
+      "category": "E-commerce",
+      "parameters": [
+        {
+          "name": "product",
+          "type": "object",
+          "required": true,
+          "description": "Product data"
+        }
+      ]
+    },
+    {
+      "id": "shopify:makeARestApiCall",
+      "name": "Make REST API Call",
+      "app": "Shopify",
+      "type": "action",
+      "description": "Makes custom REST API calls to Shopify",
+      "category": "E-commerce",
+      "parameters": [
+        {
+          "name": "apiCall",
+          "type": "object",
+          "required": true,
+          "description": "API call configuration"
+        }
+      ]
+    },
+    {
+      "id": "woocommerce:CreateProduct",
+      "name": "Create Product",
+      "app": "WooCommerce",
+      "type": "action",
+      "description": "Creates products in WooCommerce",
+      "category": "E-commerce",
+      "parameters": [
+        {
+          "name": "product",
+          "type": "object",
+          "required": true,
+          "description": "Product data"
+        }
+      ]
+    },
+    {
+      "id": "woocommerce:GetOrder",
+      "name": "Get Order",
+      "app": "WooCommerce",
+      "type": "action",
+      "description": "Retrieves orders from WooCommerce",
+      "category": "E-commerce",
+      "parameters": [
+        {
+          "name": "orderId",
+          "type": "number",
+          "required": true,
+          "description": "Order ID"
+        }
+      ]
+    },
+    {
+      "id": "square:creatOrder",
+      "name": "Create Order",
+      "app": "Square",
+      "type": "action",
+      "description": "Creates orders in Square",
+      "category": "E-commerce",
+      "parameters": [
+        {
+          "name": "order",
+          "type": "object",
+          "required": true,
+          "description": "Order data"
+        }
+      ]
+    },
+    {
+      "id": "square:searchOrders",
+      "name": "Search Orders",
+      "app": "Square",
+      "type": "action",
+      "description": "Searches orders in Square",
+      "category": "E-commerce",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "object",
+          "required": true,
+          "description": "Search query parameters"
+        }
+      ]
+    },
+    {
+      "id": "square:apiCall",
+      "name": "API Call",
+      "app": "Square",
+      "type": "action",
+      "description": "Makes custom API calls to Square",
+      "category": "E-commerce",
+      "parameters": [
+        {
+          "name": "apiCall",
+          "type": "object",
+          "required": true,
+          "description": "API call configuration"
+        }
+      ]
+    },
+    {
+      "id": "gateway:CustomMailHook",
+      "name": "Custom Mail Hook",
+      "app": "Webhooks",
+      "type": "trigger",
+      "description": "Triggers when email is received via webhook",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "hookName",
+          "type": "text",
+          "required": false,
+          "description": "Name for the mail hook"
+        }
+      ]
+    },
+    {
+      "id": "gateway:CustomWebHook",
+      "name": "Custom Webhook",
+      "app": "Webhooks",
+      "type": "trigger",
+      "description": "Triggers when webhook receives data",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "webhookName",
+          "type": "text",
+          "required": false,
+          "description": "Name for the webhook"
+        }
+      ]
+    },
+    {
+      "id": "util:Switcher",
+      "name": "Switcher",
+      "app": "Utilities",
+      "type": "transformer",
+      "description": "Routes data based on conditions",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "cases",
+          "type": "array",
+          "required": true,
+          "description": "Array of case conditions and outputs"
+        }
+      ]
+    },
+    {
+      "id": "stripe:watchEvents",
+      "name": "Watch Events",
+      "app": "Stripe",
+      "type": "trigger",
+      "description": "Triggers on Stripe events",
+      "category": "Payments",
+      "parameters": [
+        {
+          "name": "eventTypes",
+          "type": "array",
+          "required": true,
+          "description": "Types of Stripe events to watch"
+        }
+      ]
+    },
+    {
+      "id": "stripe:makeAnApiCall",
+      "name": "Make API Call",
+      "app": "Stripe",
+      "type": "action",
+      "description": "Makes custom API calls to Stripe",
+      "category": "Payments",
+      "parameters": [
+        {
+          "name": "apiCall",
+          "type": "object",
+          "required": true,
+          "description": "API call configuration"
+        }
+      ]
+    },
+    {
+      "id": "stripe:listPaymentIntents",
+      "name": "List Payment Intents",
+      "app": "Stripe",
+      "type": "action",
+      "description": "Lists payment intents in Stripe",
+      "category": "Payments",
+      "parameters": [
+        {
+          "name": "limit",
+          "type": "number",
+          "required": false,
+          "description": "Number of payment intents to return"
+        }
+      ]
+    },
+    {
+      "id": "paypal:ActionCreatePayment",
+      "name": "Create Payment",
+      "app": "PayPal",
+      "type": "action",
+      "description": "Creates payments in PayPal",
+      "category": "Payments",
+      "parameters": [
+        {
+          "name": "payment",
+          "type": "object",
+          "required": true,
+          "description": "Payment data"
+        }
+      ]
+    },
+    {
+      "id": "paypal:ActionCreatePlan",
+      "name": "Create Plan",
+      "app": "PayPal",
+      "type": "action",
+      "description": "Creates billing plans in PayPal",
+      "category": "Payments",
+      "parameters": [
+        {
+          "name": "plan",
+          "type": "object",
+          "required": true,
+          "description": "Billing plan data"
+        }
+      ]
+    },
+    {
+      "id": "salesforce:createAResponsibleRecord",
+      "name": "Create Record",
+      "app": "Salesforce",
+      "type": "action",
+      "description": "Creates records in Salesforce",
+      "category": "CRM",
+      "parameters": [
+        {
+          "name": "object",
+          "type": "text",
+          "required": true,
+          "description": "Salesforce object type"
+        },
+        {
+          "name": "record",
+          "type": "object",
+          "required": true,
+          "description": "Record data"
+        }
+      ]
+    },
+    {
+      "id": "salesforce:updateARecord",
+      "name": "Update Record",
+      "app": "Salesforce",
+      "type": "action",
+      "description": "Updates records in Salesforce",
+      "category": "CRM",
+      "parameters": [
+        {
+          "name": "object",
+          "type": "text",
+          "required": true,
+          "description": "Salesforce object type"
+        },
+        {
+          "name": "recordId",
+          "type": "text",
+          "required": true,
+          "description": "Record ID to update"
+        },
+        {
+          "name": "updates",
+          "type": "object",
+          "required": true,
+          "description": "Update data"
+        }
+      ]
+    },
+    {
+      "id": "salesforce:upsertARecord",
+      "name": "Upsert Record",
+      "app": "Salesforce",
+      "type": "action",
+      "description": "Upserts records in Salesforce",
+      "category": "CRM",
+      "parameters": [
+        {
+          "name": "object",
+          "type": "text",
+          "required": true,
+          "description": "Salesforce object type"
+        },
+        {
+          "name": "externalId",
+          "type": "text",
+          "required": true,
+          "description": "External ID field"
+        },
+        {
+          "name": "record",
+          "type": "object",
+          "required": true,
+          "description": "Record data"
+        }
+      ]
+    },
+    {
+      "id": "salesforce:makeApiCall",
+      "name": "Make API Call",
+      "app": "Salesforce",
+      "type": "action",
+      "description": "Makes custom API calls to Salesforce",
+      "category": "CRM",
+      "parameters": [
+        {
+          "name": "apiCall",
+          "type": "object",
+          "required": true,
+          "description": "API call configuration"
+        }
+      ]
+    },
+    {
+      "id": "hubspotcrm:createCustomObject",
+      "name": "Create Custom Object",
+      "app": "HubSpot CRM",
+      "type": "action",
+      "description": "Creates custom objects in HubSpot",
+      "category": "CRM",
+      "parameters": [
+        {
+          "name": "objectType",
+          "type": "text",
+          "required": true,
+          "description": "Custom object type"
+        },
+        {
+          "name": "properties",
+          "type": "object",
+          "required": true,
+          "description": "Object properties"
+        }
+      ]
+    },
+    {
+      "id": "mailchimp:createACampaign",
+      "name": "Create Campaign",
+      "app": "Mailchimp",
+      "type": "action",
+      "description": "Creates email campaigns in Mailchimp",
+      "category": "Marketing",
+      "parameters": [
+        {
+          "name": "campaign",
+          "type": "object",
+          "required": true,
+          "description": "Campaign data"
+        }
+      ]
+    },
+    {
+      "id": "activecampaign:AddTaskToDeal",
+      "name": "Add Task to Deal",
+      "app": "ActiveCampaign",
+      "type": "action",
+      "description": "Adds tasks to deals in ActiveCampaign",
+      "category": "CRM",
+      "parameters": [
+        {
+          "name": "dealId",
+          "type": "number",
+          "required": true,
+          "description": "Deal ID"
+        },
+        {
+          "name": "task",
+          "type": "object",
+          "required": true,
+          "description": "Task data"
+        }
+      ]
+    },
+    {
+      "id": "zapier:ReceiveData",
+      "name": "Receive Data",
+      "app": "Zapier",
+      "type": "trigger",
+      "description": "Triggers when data is received from Zapier",
+      "category": "Integration",
+      "parameters": [
+        {
+          "name": "hookName",
+          "type": "text",
+          "required": false,
+          "description": "Name for the data hook"
+        }
+      ]
+    },
+    {
+      "id": "facebook:ListPages",
+      "name": "List Pages",
+      "app": "Facebook",
+      "type": "action",
+      "description": "Lists Facebook pages for the authenticated user",
+      "category": "Social Media",
+      "parameters": [
+        {
+          "name": "fields",
+          "type": "array",
+          "required": false,
+          "description": "Fields to include in response"
+        }
+      ]
+    },
+    {
+      "id": "instagram-business:GetUserInsights2",
+      "name": "Get User Insights",
+      "app": "Instagram Business",
+      "type": "action",
+      "description": "Gets insights for Instagram Business accounts",
+      "category": "Social Media",
+      "parameters": [
+        {
+          "name": "userId",
+          "type": "text",
+          "required": true,
+          "description": "Instagram user ID"
+        },
+        {
+          "name": "metrics",
+          "type": "array",
+          "required": true,
+          "description": "Insight metrics to retrieve"
+        }
+      ]
+    },
+    {
+      "id": "linkedin:ShareImage",
+      "name": "Share Image",
+      "app": "LinkedIn",
+      "type": "action",
+      "description": "Shares images on LinkedIn",
+      "category": "Social Media",
+      "parameters": [
+        {
+          "name": "image",
+          "type": "file",
+          "required": true,
+          "description": "Image to share"
+        },
+        {
+          "name": "text",
+          "type": "text",
+          "required": true,
+          "description": "Share text"
+        }
+      ]
+    },
+    {
+      "id": "youtube:uploadVideo",
+      "name": "Upload Video",
+      "app": "YouTube",
+      "type": "action",
+      "description": "Uploads videos to YouTube",
+      "category": "Social Media",
+      "parameters": [
+        {
+          "name": "video",
+          "type": "file",
+          "required": true,
+          "description": "Video file to upload"
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "required": true,
+          "description": "Video title"
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "required": false,
+          "description": "Video description"
+        }
+      ]
+    },
+    {
+      "id": "trello:createABoard",
+      "name": "Create Board",
+      "app": "Trello",
+      "type": "action",
+      "description": "Creates boards in Trello",
+      "category": "Productivity",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "text",
+          "required": true,
+          "description": "Board name"
+        }
+      ]
+    },
+    {
+      "id": "asana:watchTasksOrSubtasks",
+      "name": "Watch Tasks/Subtasks",
+      "app": "Asana",
+      "type": "trigger",
+      "description": "Triggers on task or subtask changes in Asana",
+      "category": "Productivity",
+      "parameters": [
+        {
+          "name": "project",
+          "type": "text",
+          "required": false,
+          "description": "Project to watch"
+        }
+      ]
+    },
+    {
+      "id": "notion:createADatabaseV2",
+      "name": "Create Database",
+      "app": "Notion",
+      "type": "action",
+      "description": "Creates databases in Notion",
+      "category": "Productivity",
+      "parameters": [
+        {
+          "name": "parent",
+          "type": "object",
+          "required": true,
+          "description": "Parent page information"
+        },
+        {
+          "name": "properties",
+          "type": "object",
+          "required": true,
+          "description": "Database properties"
+        }
+      ]
+    },
+    {
+      "id": "ftp:TriggerNewFile",
+      "name": "Trigger New File",
+      "app": "FTP",
+      "type": "trigger",
+      "description": "Triggers when new files are detected on FTP server",
+      "category": "File Transfer",
+      "parameters": [
+        {
+          "name": "folder",
+          "type": "text",
+          "required": false,
+          "description": "Folder to watch"
+        }
+      ]
+    },
+    {
+      "id": "ftp:ActionListFiles",
+      "name": "List Files",
+      "app": "FTP",
+      "type": "action",
+      "description": "Lists files on FTP server",
+      "category": "File Transfer",
+      "parameters": [
+        {
+          "name": "folder",
+          "type": "text",
+          "required": false,
+          "description": "Folder to list"
+        }
+      ]
+    },
+    {
+      "id": "ftp:ActionUploadFile",
+      "name": "Upload File",
+      "app": "FTP",
+      "type": "action",
+      "description": "Uploads files to FTP server",
+      "category": "File Transfer",
+      "parameters": [
+        {
+          "name": "file",
+          "type": "file",
+          "required": true,
+          "description": "File to upload"
+        },
+        {
+          "name": "remotePath",
+          "type": "text",
+          "required": true,
+          "description": "Remote file path"
+        }
+      ]
+    },
+    {
+      "id": "sftp:ActionWriteFile",
+      "name": "Write File",
+      "app": "SFTP",
+      "type": "action",
+      "description": "Writes files to SFTP server",
+      "category": "File Transfer",
+      "parameters": [
+        {
+          "name": "file",
+          "type": "file",
+          "required": true,
+          "description": "File to write"
+        },
+        {
+          "name": "remotePath",
+          "type": "text",
+          "required": true,
+          "description": "Remote file path"
+        }
+      ]
+    },
+    {
+      "id": "rss:TriggerNewArticle",
+      "name": "Trigger New Article",
+      "app": "RSS",
+      "type": "trigger",
+      "description": "Triggers when new RSS feed articles are published",
+      "category": "Content",
+      "parameters": [
+        {
+          "name": "feedUrl",
+          "type": "text",
+          "required": true,
+          "description": "RSS feed URL"
+        }
+      ]
+    },
+    {
+      "id": "openai-gpt-3:createModelResponse",
+      "name": "Create Model Response",
+      "app": "OpenAI GPT-3",
+      "type": "action",
+      "description": "Generates responses using OpenAI GPT-3 model",
+      "category": "AI",
+      "parameters": [
+        {
+          "name": "prompt",
+          "type": "text",
+          "required": true,
+          "description": "Prompt for the model"
+        },
+        {
+          "name": "model",
+          "type": "text",
+          "required": false,
+          "description": "GPT-3 model to use"
+        }
+      ]
+    },
+    {
+      "id": "zendesk:ListTickets",
+      "name": "List Tickets",
+      "app": "Zendesk",
+      "type": "action",
+      "description": "Lists tickets in Zendesk",
+      "category": "Support",
+      "parameters": [
+        {
+          "name": "query",
+          "type": "text",
+          "required": false,
+          "description": "Search query"
+        }
+      ]
+    },
+    {
+      "id": "json:AggregateToJSON",
+      "name": "Aggregate to JSON",
+      "app": "JSON",
+      "type": "transformer",
+      "description": "Aggregates data into JSON format",
+      "category": "Data Transformation",
+      "parameters": [
+        {
+          "name": "source",
+          "type": "text",
+          "required": true,
+          "description": "Source data to aggregate"
+        },
+        {
+          "name": "structure",
+          "type": "object",
+          "required": true,
+          "description": "JSON structure definition"
+        }
+      ]
+    }
+  ]
+}

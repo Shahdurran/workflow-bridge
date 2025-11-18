@@ -1,0 +1,327 @@
+{
+  "modules": [
+    {
+      "id": "http:ActionGetFile",
+      "name": "Get a File",
+      "app": "HTTP",
+      "type": "action",
+      "description": "Downloads a file from a URL",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "url",
+          "type": "text",
+          "required": true,
+          "description": "The URL of the file to download"
+        }
+      ]
+    },
+    {
+      "id": "http:ActionSendDataBasicAuth",
+      "name": "Make a Request (Basic Auth)",
+      "app": "HTTP",
+      "type": "action",
+      "description": "Makes an HTTP request with Basic Authentication",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "url",
+          "type": "text",
+          "required": true,
+          "description": "The URL to make the request to"
+        },
+        {
+          "name": "method",
+          "type": "select",
+          "required": true,
+          "description": "HTTP method",
+          "options": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+        },
+        {
+          "name": "username",
+          "type": "text",
+          "required": true,
+          "description": "Basic auth username"
+        },
+        {
+          "name": "password",
+          "type": "text",
+          "required": true,
+          "description": "Basic auth password"
+        },
+        {
+          "name": "headers",
+          "type": "array",
+          "required": false,
+          "description": "HTTP headers"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": false,
+          "description": "Request body"
+        }
+      ]
+    },
+    {
+      "id": "http:ActionSendDataClientCertAuth",
+      "name": "Make a Request (Client Certificate)",
+      "app": "HTTP",
+      "type": "action",
+      "description": "Makes an HTTP request with Client Certificate Authentication",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "url",
+          "type": "text",
+          "required": true,
+          "description": "The URL to make the request to"
+        },
+        {
+          "name": "method",
+          "type": "select",
+          "required": true,
+          "description": "HTTP method",
+          "options": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+        },
+        {
+          "name": "certificate",
+          "type": "text",
+          "required": true,
+          "description": "Client certificate"
+        },
+        {
+          "name": "headers",
+          "type": "array",
+          "required": false,
+          "description": "HTTP headers"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": false,
+          "description": "Request body"
+        }
+      ]
+    },
+    {
+      "id": "http:ActionSendDataAPIKeyAuth",
+      "name": "Make a Request (API Key)",
+      "app": "HTTP",
+      "type": "action",
+      "description": "Makes an HTTP request with API Key Authentication",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "url",
+          "type": "text",
+          "required": true,
+          "description": "The URL to make the request to"
+        },
+        {
+          "name": "method",
+          "type": "select",
+          "required": true,
+          "description": "HTTP method",
+          "options": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+        },
+        {
+          "name": "apiKey",
+          "type": "text",
+          "required": true,
+          "description": "API key"
+        },
+        {
+          "name": "headers",
+          "type": "array",
+          "required": false,
+          "description": "HTTP headers"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": false,
+          "description": "Request body"
+        }
+      ]
+    },
+    {
+      "id": "http:ActionSendDataOAuth",
+      "name": "Make a Request (OAuth 2.0)",
+      "app": "HTTP",
+      "type": "action",
+      "description": "Makes an HTTP request with OAuth 2.0 Authentication",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "url",
+          "type": "text",
+          "required": true,
+          "description": "The URL to make the request to"
+        },
+        {
+          "name": "method",
+          "type": "select",
+          "required": true,
+          "description": "HTTP method",
+          "options": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+        },
+        {
+          "name": "oauthConnection",
+          "type": "text",
+          "required": true,
+          "description": "OAuth 2.0 connection"
+        },
+        {
+          "name": "headers",
+          "type": "array",
+          "required": false,
+          "description": "HTTP headers"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": false,
+          "description": "Request body"
+        }
+      ]
+    },
+    {
+      "id": "http:ActionSendData",
+      "name": "Make a Request",
+      "app": "HTTP",
+      "type": "action",
+      "description": "Makes an HTTP request to any URL",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "url",
+          "type": "text",
+          "required": true,
+          "description": "The URL to make the request to"
+        },
+        {
+          "name": "method",
+          "type": "select",
+          "required": true,
+          "description": "HTTP method",
+          "options": ["GET", "POST", "PUT", "PATCH", "DELETE"]
+        },
+        {
+          "name": "headers",
+          "type": "array",
+          "required": false,
+          "description": "HTTP headers"
+        },
+        {
+          "name": "body",
+          "type": "text",
+          "required": false,
+          "description": "Request body"
+        }
+      ]
+    },
+    {
+      "id": "http:ActionResolveTargetURL",
+      "name": "Resolve a Target URL",
+      "app": "HTTP",
+      "type": "action",
+      "description": "Resolves and follows redirects for a URL",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "url",
+          "type": "text",
+          "required": true,
+          "description": "The URL to resolve"
+        }
+      ]
+    },
+    {
+      "id": "gateway:CustomWebHook",
+      "name": "Custom Webhook",
+      "app": "Webhooks",
+      "type": "trigger",
+      "description": "Triggers when a webhook receives data",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "webhookName",
+          "type": "text",
+          "required": false,
+          "description": "Name for the webhook"
+        }
+      ]
+    },
+    {
+      "id": "builtin:BasicRouter",
+      "name": "Router",
+      "app": "Flow Control",
+      "type": "router",
+      "description": "Splits the flow into multiple routes based on conditions",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "routes",
+          "type": "array",
+          "required": true,
+          "description": "Array of route configurations with filters"
+        }
+      ]
+    },
+    {
+      "id": "builtin:BasicFeeder",
+      "name": "Iterator",
+      "app": "Flow Control",
+      "type": "iterator",
+      "description": "Splits an array into individual bundles",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "array",
+          "type": "array",
+          "required": true,
+          "description": "Array to iterate over"
+        }
+      ]
+    },
+    {
+      "id": "builtin:BasicRepeater",
+      "name": "Repeater",
+      "app": "Flow Control",
+      "type": "repeater",
+      "description": "Repeats operations a specified number of times",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "repeats",
+          "type": "number",
+          "required": true,
+          "description": "Number of times to repeat"
+        }
+      ]
+    },
+    {
+      "id": "builtin:BasicAggregator",
+      "name": "Array Aggregator",
+      "app": "Flow Control",
+      "type": "aggregator",
+      "description": "Aggregates multiple bundles into a single array",
+      "category": "Core",
+      "parameters": [
+        {
+          "name": "sourceModule",
+          "type": "text",
+          "required": true,
+          "description": "Source module to aggregate from"
+        },
+        {
+          "name": "aggregatedFields",
+          "type": "array",
+          "required": false,
+          "description": "Fields to include in the aggregated array"
+        }
+      ]
+    }
+  ]
+}

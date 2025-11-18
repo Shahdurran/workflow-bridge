@@ -1,0 +1,216 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2024-01-01",
+  "triggers": {
+    "webhook": {
+      "n8n": {
+        "node_type": "n8n-nodes-base.webhook",
+        "common_params": ["httpMethod", "path", "responseMode"]
+      },
+      "make": {
+        "module_type": "gateway:WebhookRespond",
+        "common_params": ["method", "custom_webhook"]
+      },
+      "zapier": {
+        "app": "webhooks",
+        "event": "catch_hook",
+        "common_params": []
+      },
+      "translation_notes": "Webhook URLs are platform-specific and cannot be directly translated"
+    },
+    "schedule": {
+      "n8n": {
+        "node_type": "n8n-nodes-base.scheduleTrigger",
+        "common_params": ["rule", "triggerTimes"]
+      },
+      "make": {
+        "module_type": "gateway:ScheduleTrigger",
+        "common_params": ["schedule", "interval"]
+      },
+      "zapier": {
+        "app": "schedule",
+        "event": "every_hour",
+        "common_params": ["interval"]
+      }
+    },
+    "email_received": {
+      "n8n": {
+        "node_type": "n8n-nodes-base.emailReadImap",
+        "common_params": ["mailbox", "options"]
+      },
+      "make": {
+        "module_type": "email:TriggerWatchEmails",
+        "common_params": ["folder", "criteria"]
+      },
+      "zapier": {
+        "app": "email",
+        "event": "new_inbound_email",
+        "common_params": ["to"]
+      }
+    }
+  },
+  "actions": {
+    "http_request": {
+      "n8n": {
+        "node_type": "n8n-nodes-base.httpRequest",
+        "params_map": {
+          "url": "url",
+          "method": "method",
+          "headers": "headerParameters.parameters",
+          "body": "body"
+        }
+      },
+      "make": {
+        "module_type": "http:ActionSendData",
+        "params_map": {
+          "url": "url",
+          "method": "method",
+          "headers": "qs",
+          "body": "body"
+        }
+      },
+      "zapier": {
+        "app": "webhooks",
+        "action": "post",
+        "params_map": {
+          "url": "url",
+          "method": "method",
+          "headers": "headers",
+          "body": "data"
+        }
+      }
+    },
+    "send_email": {
+      "n8n": {
+        "node_type": "n8n-nodes-base.gmail",
+        "params_map": {
+          "to": "toList",
+          "subject": "subject",
+          "body": "message"
+        }
+      },
+      "make": {
+        "module_type": "email:ActionSendEmail",
+        "params_map": {
+          "to": "to",
+          "subject": "subject",
+          "body": "text"
+        }
+      },
+      "zapier": {
+        "app": "gmail",
+        "action": "send_email",
+        "params_map": {
+          "to": "to",
+          "subject": "subject",
+          "body": "body"
+        }
+      }
+    },
+    "google_sheets_add_row": {
+      "n8n": {
+        "node_type": "n8n-nodes-base.googleSheets",
+        "operation": "append",
+        "params_map": {
+          "spreadsheet_id": "sheetId",
+          "sheet_name": "sheetName",
+          "values": "columns"
+        }
+      },
+      "make": {
+        "module_type": "google-sheets:ActionAddARow",
+        "params_map": {
+          "spreadsheet_id": "spreadsheetId",
+          "sheet_name": "sheetName",
+          "values": "values"
+        }
+      },
+      "zapier": {
+        "app": "google_sheets",
+        "action": "create_spreadsheet_row",
+        "params_map": {
+          "spreadsheet_id": "spreadsheet",
+          "sheet_name": "worksheet",
+          "values": "values"
+        }
+      }
+    },
+    "slack_message": {
+      "n8n": {
+        "node_type": "n8n-nodes-base.slack",
+        "params_map": {
+          "channel": "channel",
+          "text": "text",
+          "attachments": "attachments"
+        }
+      },
+      "make": {
+        "module_type": "slack:ActionCreateAMessage",
+        "params_map": {
+          "channel": "channel",
+          "text": "text",
+          "attachments": "attachments"
+        }
+      },
+      "zapier": {
+        "app": "slack",
+        "action": "send_channel_message",
+        "params_map": {
+          "channel": "channel",
+          "text": "message_text",
+          "attachments": "attachments"
+        }
+      }
+    }
+  },
+  "conditional_logic": {
+    "n8n": {
+      "node_type": "n8n-nodes-base.if",
+      "supports": ["conditions", "multiple_branches"],
+      "output_branches": 2
+    },
+    "make": {
+      "module_type": "builtin:Router",
+      "supports": ["conditions", "multiple_routes", "fallback"],
+      "output_branches": "unlimited"
+    },
+    "zapier": {
+      "node_type": "filter",
+      "supports": ["simple_conditions"],
+      "output_branches": 1,
+      "notes": "Zapier only supports pass/stop, not multiple branches"
+    }
+  },
+  "loops": {
+    "n8n": {
+      "supported": true,
+      "node_type": "n8n-nodes-base.splitInBatches"
+    },
+    "make": {
+      "supported": true,
+      "module_type": "builtin:Iterator"
+    },
+    "zapier": {
+      "supported": false,
+      "workaround": "Use Looping by Zapier (premium)"
+    }
+  },
+  "error_handling": {
+    "n8n": {
+      "supported": true,
+      "method": "error_workflow",
+      "can_continue": true
+    },
+    "make": {
+      "supported": true,
+      "method": "error_handler_route",
+      "can_retry": true
+    },
+    "zapier": {
+      "supported": true,
+      "method": "error_notification",
+      "limited": true
+    }
+  }
+}
+

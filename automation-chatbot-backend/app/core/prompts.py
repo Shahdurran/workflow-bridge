@@ -2,7 +2,7 @@
 LangChain prompt templates for workflow automation AI service.
 """
 
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 # Intent extraction prompt template
 INTENT_EXTRACTION_PROMPT = PromptTemplate(
