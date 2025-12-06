@@ -12,16 +12,18 @@ export const APP_TAGLINE = branding.app.tagline;
 export const APP_DESCRIPTION = branding.app.description;
 
 // Platform information
+// NOTE: Beta phase - Only Make and n8n supported
 export const PLATFORMS = [
-  {
-    id: 'zapier' as const,
-    name: 'Zapier',
-    icon: '⚡',
-    color: '#ff4a00',
-    lightColor: '#fff5f0',
-    description: 'Connect 5,000+ apps with powerful workflows',
-    url: 'https://zapier.com',
-  },
+  // Zapier temporarily disabled for beta
+  // {
+  //   id: 'zapier' as const,
+  //   name: 'Zapier',
+  //   icon: '⚡',
+  //   color: '#ff4a00',
+  //   lightColor: '#fff5f0',
+  //   description: 'Connect 5,000+ apps with powerful workflows',
+  //   url: 'https://zapier.com',
+  // },
   {
     id: 'make' as const,
     name: 'Make',

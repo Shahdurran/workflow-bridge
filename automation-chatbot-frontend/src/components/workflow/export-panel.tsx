@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { WorkflowNode, WorkflowConnection } from "@/types/api";
-import { Platform } from "@/pages/home";
-import { generateZapierJSON, generateMakeJSON, generateN8nJSON } from "@/utils/json-generator";
-import { Download, X, Copy, Check } from "lucide-react";
+import { WorkflowNode, WorkflowConnection, Platform } from "@/types/api";
+import { transformFromCanvas } from "@/utils/workflow-transformer";
+import { translateWorkflow } from "@/services/api";
+import { Download, X, Copy, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ExportPanelProps {
@@ -25,42 +25,71 @@ export default function ExportPanel({
   const [previewData, setPreviewData] = useState<any>(null);
   const [previewPlatform, setPreviewPlatform] = useState<Platform>('zapier');
   const [copied, setCopied] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const { toast } = useToast();
 
-  const exportWorkflow = (targetPlatform: Platform) => {
-    let jsonData;
-    let filename;
+  const exportWorkflow = async (targetPlatform: Platform) => {
+    setIsTranslating(true);
+    
+    try {
+      let jsonData;
+      
+      // If exporting to same platform, no translation needed
+      if (targetPlatform === platform) {
+        jsonData = transformFromCanvas(nodes, connections, platform);
+      } else {
+        // Use workflow-translator for cross-platform export
+        const sourceWorkflow = transformFromCanvas(nodes, connections, platform);
+        
+        toast({
+          title: "Translating...",
+          description: `Converting from ${platform} to ${targetPlatform}`,
+        });
+        
+        const result = await translateWorkflow(sourceWorkflow, platform, targetPlatform);
+        
+        if (result.success) {
+          jsonData = result.translated_workflow;
+          
+          if (result.warnings && result.warnings.length > 0) {
+            toast({
+              title: "Translation completed with warnings",
+              description: `${result.warnings.length} warning(s). Check preview for details.`,
+              variant: "default",
+            });
+          }
+        } else {
+          throw new Error('Translation failed');
+        }
+      }
+      
+      const filename = `${targetPlatform}-workflow.json`;
+      
+      // Download the JSON file
+      const blob = new Blob([JSON.stringify(jsonData, null, 2)], { 
+        type: 'application/json' 
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
 
-    switch (targetPlatform) {
-      case 'zapier':
-        jsonData = generateZapierJSON(nodes, connections);
-        filename = 'zapier-workflow.json';
-        break;
-      case 'make':
-        jsonData = generateMakeJSON(nodes, connections);
-        filename = 'make-scenario.json';
-        break;
-      case 'n8n':
-        jsonData = generateN8nJSON(nodes, connections);
-        filename = 'n8n-workflow.json';
-        break;
+      toast({
+        title: "Export Successful",
+        description: `Workflow exported for ${targetPlatform}`,
+      });
+    } catch (error) {
+      console.error('Export failed:', error);
+      toast({
+        title: "Export Failed",
+        description: error instanceof Error ? error.message : 'Unknown error',
+        variant: "destructive",
+      });
+    } finally {
+      setIsTranslating(false);
     }
-
-    // Download the JSON file
-    const blob = new Blob([JSON.stringify(jsonData, null, 2)], { 
-      type: 'application/json' 
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    toast({
-      title: "Export Successful",
-      description: `Workflow exported for ${targetPlatform}`,
-    });
   };
 
   const previewWorkflow = (targetPlatform: Platform) => {
@@ -116,27 +145,30 @@ export default function ExportPanel({
           <Button
             className="w-full bg-zapier text-white hover:opacity-90 text-sm"
             onClick={() => exportWorkflow('zapier')}
+            disabled={isTranslating}
             data-testid="button-export-zapier"
           >
-            <Download size={14} className="mr-2" />
+            {isTranslating ? <Loader2 size={14} className="mr-2 animate-spin" /> : <Download size={14} className="mr-2" />}
             Export to Zapier
           </Button>
           
           <Button
             className="w-full bg-make text-white hover:opacity-90 text-sm"
             onClick={() => exportWorkflow('make')}
+            disabled={isTranslating}
             data-testid="button-export-make"
           >
-            <Download size={14} className="mr-2" />
+            {isTranslating ? <Loader2 size={14} className="mr-2 animate-spin" /> : <Download size={14} className="mr-2" />}
             Export to Make
           </Button>
           
           <Button
             className="w-full bg-n8n text-white hover:opacity-90 text-sm"
             onClick={() => exportWorkflow('n8n')}
+            disabled={isTranslating}
             data-testid="button-export-n8n"
           >
-            <Download size={14} className="mr-2" />
+            {isTranslating ? <Loader2 size={14} className="mr-2 animate-spin" /> : <Download size={14} className="mr-2" />}
             Export to n8n
           </Button>
 

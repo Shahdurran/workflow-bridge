@@ -93,17 +93,18 @@ class WorkflowIntent(BaseModel):
 
 class WorkflowGenerateRequest(BaseModel):
     """Request model for workflow generation."""
-    platform: Literal["n8n", "make", "zapier"]
+    # Beta phase: Only n8n and make supported
+    platform: Literal["n8n", "make", "zapier"]  # zapier kept for future use
     intent: WorkflowIntent
     parameters: Dict[str, Any] = Field(default_factory=dict)
     workflow_name: Optional[str] = None
     
     @validator("platform")
     def validate_platform(cls, v):
-        """Validate platform is supported."""
-        supported = ["n8n", "make", "zapier"]
+        """Validate platform is supported (beta: n8n and make only)."""
+        supported = ["n8n", "make"]  # zapier disabled for beta
         if v.lower() not in supported:
-            raise ValueError(f"Platform must be one of: {supported}")
+            raise ValueError(f"Platform must be one of: {supported}. (Zapier coming soon)")
         return v.lower()
 
 class WorkflowGenerationResponse(BaseModel):

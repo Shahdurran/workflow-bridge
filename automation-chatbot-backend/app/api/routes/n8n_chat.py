@@ -193,6 +193,15 @@ async def chat_with_claude(
                             "success": True
                         })
                     
+                    elif chunk_type == "workflow_clear":
+                        # Clear canvas before streaming new workflow
+                        yield await format_sse_message("workflow_clear", {})
+                    
+                    elif chunk_type == "workflow_node":
+                        # Individual node for incremental rendering
+                        node_data = chunk.get("content", {})
+                        yield await format_sse_message("workflow_node", node_data)
+                    
                     elif chunk_type == "workflow":
                         # Workflow extracted - store it but don't send yet
                         workflow_data = chunk.get("content")

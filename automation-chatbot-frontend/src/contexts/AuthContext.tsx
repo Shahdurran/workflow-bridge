@@ -11,7 +11,13 @@ const isConfigured = supabaseUrl && supabaseAnonKey &&
 
 export const supabase: SupabaseClient = isConfigured 
   ? createClient(supabaseUrl, supabaseAnonKey)
-  : createClient('https://placeholder.supabase.co', 'placeholder-key');
+  : createClient('https://placeholder.supabase.co', 'placeholder-key', {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+        detectSessionInUrl: false
+      }
+    });
 
 interface AuthContextType {
   user: User | null;
@@ -32,7 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (!isConfigured) {
-      console.warn('Supabase is not configured. Authentication features will be disabled.');
+      console.log('ℹ️ Supabase is not configured. Using local authentication mode.');
       setLoading(false);
       return;
     }
@@ -43,7 +49,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(session?.user ?? null);
       setLoading(false);
     }).catch((error) => {
-      console.error('Error getting session:', error);
+      console.log('ℹ️ Supabase authentication not available. Using local mode.');
       setLoading(false);
     });
 

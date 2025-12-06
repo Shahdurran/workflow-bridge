@@ -7,7 +7,7 @@ import logging
 from datetime import datetime
 
 from app.api.routes import chat, workflow, platforms, feedback, translation
-from app.api.routes import n8n_chat
+from app.api.routes import n8n_chat, make_chat
 from app.services.supabase_client import get_supabase_client
 from app.services.n8n_mcp_client import get_mcp_client
 from app.core.config import settings, get_cors_config, validate_required_settings
@@ -67,6 +67,7 @@ if settings.is_production:
 # Include routers
 app.include_router(chat.router, prefix="/api/chat", tags=["chat"])
 app.include_router(n8n_chat.router, prefix="/api/n8n", tags=["n8n-chat"])
+app.include_router(make_chat.router, prefix="/api/make", tags=["make-chat"])
 app.include_router(workflow.router, prefix="/api/workflow", tags=["workflow"])
 app.include_router(platforms.router, prefix="/api/platforms", tags=["platforms"])
 app.include_router(feedback.router, prefix="/api/feedback", tags=["feedback"])

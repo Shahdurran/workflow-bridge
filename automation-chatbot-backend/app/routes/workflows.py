@@ -181,6 +181,7 @@ async def generate_workflow(
         # Generate workflow based on platform
         start_time = datetime.utcnow()
         
+        # Beta phase: Only n8n and Make supported
         if request.platform == "n8n":
             workflow_json = await generator.generate_n8n_workflow(
                 intent=request.intent.dict(),
@@ -192,14 +193,15 @@ async def generate_workflow(
                 parameters=request.parameters
             )
         elif request.platform == "zapier":
-            workflow_json = await generator.generate_zapier_workflow(
-                intent=request.intent.dict(),
-                parameters=request.parameters
+            # Zapier support disabled for beta
+            raise HTTPException(
+                status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                detail="Zapier support is coming soon. Currently in beta: Make and n8n only."
             )
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Unsupported platform: {request.platform}"
+                detail=f"Unsupported platform: {request.platform}. Supported: n8n, make"
             )
         
         generation_time = (datetime.utcnow() - start_time).total_seconds() * 1000

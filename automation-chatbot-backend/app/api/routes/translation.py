@@ -8,23 +8,13 @@ from pydantic import BaseModel, Field
 from typing import Dict, List, Optional, Any
 import logging
 
-from app.services.translator_client import WorkflowTranslatorClient
-from app.services.make_mcp_client import MakeMcpClient
-from app.services.n8n_mcp_client import N8nMcpClient
+from app.services.translator_client import get_translator_client, TranslatorClient
+from app.services.make_mcp_client import get_make_mcp_client, MakeMcpClient
+from app.services.n8n_mcp_client import get_mcp_client, N8nMcpClient
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/translation", tags=["translation"])
-
-# Dependency injection
-def get_translator_client() -> WorkflowTranslatorClient:
-    return WorkflowTranslatorClient()
-
-def get_make_client() -> MakeMcpClient:
-    return MakeMcpClient()
-
-def get_n8n_client() -> N8nMcpClient:
-    return N8nMcpClient()
+router = APIRouter(prefix="/api/translate", tags=["translation"])
 
 
 # Request/Response Models
@@ -89,12 +79,10 @@ class TranslationComplexityResponse(BaseModel):
 
 
 # Endpoints
-@router.post("/translate", response_model=TranslateWorkflowResponse)
+@router.post("/workflow", response_model=TranslateWorkflowResponse)
 async def translate_workflow(
     request: TranslateWorkflowRequest,
-    translator: WorkflowTranslatorClient = Depends(get_translator_client),
-    make_client: MakeMcpClient = Depends(get_make_client),
-    n8n_client: N8nMcpClient = Depends(get_n8n_client)
+    translator: TranslatorClient = Depends(get_translator_client)
 ):
     """
     Translate a workflow from one platform to another
@@ -123,47 +111,27 @@ async def translate_workflow(
             strict_mode=request.strict_mode
         )
         
-        # Validate translated workflow if requested
-        validation_result = None
-        if request.validate_result and result.get("success"):
-            try:
-                if request.target_platform == "make":
-                    validation_result = await make_client.validate_make_scenario(
-                        scenario=result["translated_workflow"],
-                        profile="balanced"
-                    )
-                elif request.target_platform == "n8n":
-                    validation_result = await n8n_client.validate_workflow(
-                        workflow=result["translated_workflow"]
-                    )
-            except Exception as e:
-                logger.warning(f"Validation failed: {e}")
-                validation_result = {"error": str(e)}
-        
         return TranslateWorkflowResponse(
             success=result.get("success", False),
-            translated_workflow=result.get("translated_workflow", {}),
-            source_platform=result.get("source_platform", request.source_platform),
-            target_platform=result.get("target_platform", request.target_platform),
+            translated_workflow=result.get("workflow", {}),
+            source_platform=result.get("sourcePlatform", request.source_platform),
+            target_platform=result.get("targetPlatform", request.target_platform),
             warnings=result.get("warnings", []),
             errors=result.get("errors", []),
             metadata=result.get("metadata", {}),
-            validation=validation_result
+            validation=None
         )
         
     except Exception as e:
         logger.error(f"Translation failed: {e}")
         raise HTTPException(status_code=500, detail=f"Translation failed: {str(e)}")
-    finally:
-        await translator.close()
-        await make_client.close()
         await n8n_client.close()
 
 
 @router.post("/feasibility", response_model=FeasibilityCheckResponse)
 async def check_feasibility(
     request: FeasibilityCheckRequest,
-    translator: WorkflowTranslatorClient = Depends(get_translator_client)
+    translator: TranslatorClient = Depends(get_translator_client)
 ):
     """
     Check if a workflow can be successfully translated to target platform
@@ -207,7 +175,7 @@ async def check_feasibility(
 @router.get("/platforms/capabilities")
 async def get_platform_capabilities(
     platforms: Optional[str] = None,
-    translator: WorkflowTranslatorClient = Depends(get_translator_client)
+    translator: TranslatorClient = Depends(get_translator_client)
 ):
     """
     Get capabilities comparison for automation platforms
@@ -237,7 +205,7 @@ async def get_platform_capabilities(
 async def get_translation_complexity(
     source_platform: str,
     target_platform: str,
-    translator: WorkflowTranslatorClient = Depends(get_translator_client)
+    translator: TranslatorClient = Depends(get_translator_client)
 ):
     """
     Get difficulty and success rate for a specific translation path
@@ -272,7 +240,7 @@ async def get_translation_complexity(
 @router.post("/recommend-platform", response_model=PlatformRecommendationResponse)
 async def recommend_platform(
     request: PlatformRecommendationRequest,
-    translator: WorkflowTranslatorClient = Depends(get_translator_client)
+    translator: TranslatorClient = Depends(get_translator_client)
 ):
     """
     Get platform recommendation based on requirements
@@ -323,7 +291,7 @@ async def translate_expression(
     source_platform: str,
     target_platform: str,
     context: Optional[Dict[str, Any]] = None,
-    translator: WorkflowTranslatorClient = Depends(get_translator_client)
+    translator: TranslatorClient = Depends(get_translator_client)
 ):
     """
     Translate a single expression between platform syntaxes
@@ -357,7 +325,7 @@ async def translate_expression(
 async def analyze_workflow_complexity(
     workflow: Dict[str, Any],
     platform: str,
-    translator: WorkflowTranslatorClient = Depends(get_translator_client)
+    translator: TranslatorClient = Depends(get_translator_client)
 ):
     """
     Analyze workflow complexity and get optimization suggestions
@@ -393,7 +361,7 @@ async def batch_translate_workflows(
     source_platform: str,
     target_platform: str,
     optimize: bool = True,
-    translator: WorkflowTranslatorClient = Depends(get_translator_client)
+    translator: TranslatorClient = Depends(get_translator_client)
 ):
     """
     Translate multiple workflows at once
@@ -429,9 +397,9 @@ async def batch_translate_workflows(
 
 @router.get("/health")
 async def health_check(
-    translator: WorkflowTranslatorClient = Depends(get_translator_client),
-    make_client: MakeMcpClient = Depends(get_make_client),
-    n8n_client: N8nMcpClient = Depends(get_n8n_client)
+    translator: TranslatorClient = Depends(get_translator_client),
+    make_client: MakeMcpClient = Depends(get_make_mcp_client),
+    n8n_client: N8nMcpClient = Depends(get_mcp_client)
 ):
     """
     Check health of all translation services

@@ -41,7 +41,7 @@ class MessageResponse(BaseModel):
 class WorkflowGenerationRequest(BaseModel):
     """Request model for generating workflow JSON."""
     session_id: str = Field(..., description="Conversation session ID")
-    platform: str = Field(..., description="Target platform (zapier, make, n8n)")
+    platform: str = Field(..., description="Target platform (make, n8n) - Beta: zapier coming soon")
     workflow_name: Optional[str] = Field(None, description="Custom workflow name")
     parameters: Optional[dict] = Field(None, description="Additional workflow parameters")
 

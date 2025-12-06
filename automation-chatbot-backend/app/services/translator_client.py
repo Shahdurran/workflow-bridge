@@ -1,91 +1,141 @@
 """
-Workflow Translator Client
-HTTP client for communicating with the Workflow Translator service
+Workflow Translator MCP Client
+
+Client for interacting with workflow-translator MCP service.
 """
 
 import httpx
 import logging
-from typing import Dict, List, Optional, Any
-from datetime import datetime
+from typing import Dict, Any, Optional, List
+from fastapi import HTTPException
+
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
 
-class WorkflowTranslatorClient:
-    """Client for interacting with Workflow Translator service via HTTP"""
+class TranslatorClient:
+    """
+    Client for interacting with workflow-translator MCP server.
     
-    def __init__(self, base_url: str = "http://localhost:3003"):
-        self.base_url = base_url.rstrip('/')
-        self.client = httpx.AsyncClient(timeout=60.0)  # Longer timeout for AI translations
-        self._initialized = False
+    This client provides methods to:
+    - Translate workflows between platforms (n8n, Make, Zapier)
+    - Check translation feasibility
+    - Get platform capabilities comparison
+    """
+    
+    def __init__(self, mcp_url: Optional[str] = None):
+        """
+        Initialize Translator MCP client.
         
-    async def _initialize_if_needed(self):
-        """Initialize connection to Workflow Translator service"""
-        if self._initialized:
-            return
-            
-        try:
-            response = await self.client.get(f"{self.base_url}/health")
-            if response.status_code == 200:
-                self._initialized = True
-                logger.info("Workflow Translator client initialized successfully")
-            else:
-                logger.warning(f"Workflow Translator health check returned status {response.status_code}")
-        except Exception as e:
-            logger.error(f"Failed to initialize Workflow Translator client: {e}")
-            raise
+        Args:
+            mcp_url: URL of the workflow-translator HTTP server
+        """
+        self.mcp_url = mcp_url or settings.translator_mcp_url
+        self.timeout = 60.0
+        self._request_id = 1
+        
+        if not self.mcp_url:
+            logger.warning("Translator MCP URL not configured. Translation features will be unavailable.")
     
-    async def _call_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Call a Workflow Translator tool via HTTP JSON-RPC"""
-        await self._initialize_if_needed()
+    def is_configured(self) -> bool:
+        """Check if Translator MCP is properly configured."""
+        return bool(self.mcp_url)
+    
+    async def health_check(self) -> Dict[str, Any]:
+        """Check if translator service is available."""
+        if not self.is_configured():
+            raise HTTPException(
+                status_code=503,
+                detail="Translator MCP is not configured"
+            )
+        
+        try:
+            async with httpx.AsyncClient(timeout=5.0) as client:
+                response = await client.get(f"{self.mcp_url}/health")
+                response.raise_for_status()
+                return response.json()
+        except Exception as e:
+            logger.error(f"Translator MCP health check failed: {str(e)}")
+            raise HTTPException(
+                status_code=503,
+                detail=f"Translator MCP service unavailable: {str(e)}"
+            )
+    
+    async def _call_tool(self, tool_name: str, tool_input: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Call a Translator MCP tool via HTTP JSON-RPC.
+        
+        Args:
+            tool_name: Name of the tool to call
+            tool_input: Input parameters for the tool
+            
+        Returns:
+            Tool result data
+        """
+        if not self.is_configured():
+            raise HTTPException(
+                status_code=503,
+                detail="Translator MCP is not configured"
+            )
         
         payload = {
             "jsonrpc": "2.0",
-            "id": str(datetime.now().timestamp()),
             "method": "tools/call",
             "params": {
                 "name": tool_name,
-                "arguments": arguments
-            }
+                "arguments": tool_input
+            },
+            "id": self._request_id
         }
+        self._request_id += 1
         
         try:
-            response = await self.client.post(
-                f"{self.base_url}/mcp",
-                json=payload,
-                headers={"Content-Type": "application/json"}
-            )
-            response.raise_for_status()
-            
-            result = response.json()
-            
-            if "error" in result:
-                logger.error(f"Workflow Translator tool error: {result['error']}")
-                raise Exception(f"Workflow Translator error: {result['error']}")
-            
-            return result.get("result", {})
-            
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                logger.debug(f"Calling Translator MCP tool: {tool_name}")
+                response = await client.post(f"{self.mcp_url}/mcp", json=payload)
+                response.raise_for_status()
+                result = response.json()
+                
+                # Check for JSON-RPC error
+                if "error" in result:
+                    error = result["error"]
+                    logger.error(f"Translator MCP tool {tool_name} returned error: {error}")
+                    raise HTTPException(
+                        status_code=500,
+                        detail=f"Translator MCP error: {error.get('message', 'Unknown error')}"
+                    )
+                
+                # Extract the result
+                if "result" not in result:
+                    logger.error(f"Invalid Translator MCP response: {result}")
+                    raise HTTPException(
+                        status_code=500,
+                        detail="Invalid Translator MCP response"
+                    )
+                
+                # Parse content from MCP response
+                mcp_result = result["result"]
+                if "content" in mcp_result and len(mcp_result["content"]) > 0:
+                    content_item = mcp_result["content"][0]
+                    if content_item.get("type") == "text":
+                        import json
+                        return json.loads(content_item["text"])
+                
+                return mcp_result
+                
         except httpx.HTTPError as e:
-            logger.error(f"HTTP error calling Workflow Translator tool {tool_name}: {e}")
-            raise
+            logger.error(f"HTTP error calling Translator MCP: {str(e)}")
+            raise HTTPException(
+                status_code=503,
+                detail=f"Translator MCP service error: {str(e)}"
+            )
         except Exception as e:
-            logger.error(f"Error calling Workflow Translator tool {tool_name}: {e}")
-            raise
-    
-    async def health_check(self) -> Dict[str, Any]:
-        """Check if Workflow Translator service is healthy"""
-        try:
-            response = await self.client.get(f"{self.base_url}/health")
-            return {
-                "status": "healthy" if response.status_code == 200 else "unhealthy",
-                "status_code": response.status_code,
-                "response": response.json() if response.status_code == 200 else None
-            }
-        except Exception as e:
-            return {
-                "status": "error",
-                "error": str(e)
-            }
+            logger.error(f"Error calling Translator MCP tool {tool_name}: {str(e)}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Translator error: {str(e)}"
+            )
     
     async def translate_workflow(
         self,
@@ -97,29 +147,27 @@ class WorkflowTranslatorClient:
         strict_mode: bool = False
     ) -> Dict[str, Any]:
         """
-        Translate a workflow between platforms
+        Translate a workflow from one platform to another.
         
         Args:
             workflow: Workflow JSON to translate
             source_platform: Source platform (n8n, make, zapier)
             target_platform: Target platform (n8n, make, zapier)
             optimize: Apply platform-specific optimizations
-            preserve_names: Preserve original node/module names
+            preserve_names: Preserve original node names
             strict_mode: Fail on any translation issues
             
         Returns:
-            Translation result with translated workflow and metadata
+            Translation result with workflow, warnings, and metadata
         """
-        arguments = {
+        return await self._call_tool("translate_workflow", {
             "workflow": workflow,
             "sourcePlatform": source_platform,
             "targetPlatform": target_platform,
             "optimize": optimize,
             "preserveNames": preserve_names,
             "strictMode": strict_mode
-        }
-        
-        return await self._call_tool("translate_workflow", arguments)
+        })
     
     async def check_translation_feasibility(
         self,
@@ -128,7 +176,7 @@ class WorkflowTranslatorClient:
         target_platform: str
     ) -> Dict[str, Any]:
         """
-        Check if a workflow can be successfully translated
+        Check if a workflow can be successfully translated.
         
         Args:
             workflow: Workflow JSON to analyze
@@ -136,35 +184,30 @@ class WorkflowTranslatorClient:
             target_platform: Target platform
             
         Returns:
-            Feasibility analysis with score, issues, and suggestions
+            Feasibility analysis with blockers and warnings
         """
-        arguments = {
+        return await self._call_tool("check_translation_feasibility", {
             "workflow": workflow,
             "sourcePlatform": source_platform,
             "targetPlatform": target_platform
-        }
-        
-        return await self._call_tool("check_translation_feasibility", arguments)
+        })
     
     async def get_platform_capabilities(
         self,
         platforms: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """
-        Get capabilities comparison for platforms
+        Get platform capabilities comparison.
         
         Args:
-            platforms: List of platforms to compare (default: all three)
+            platforms: List of platforms to compare (default: all)
             
         Returns:
-            Capabilities matrix for requested platforms
+            Platform capabilities matrix
         """
-        arguments = {}
-        
-        if platforms:
-            arguments["platforms"] = platforms
-        
-        return await self._call_tool("get_platform_capabilities", arguments)
+        return await self._call_tool("get_platform_capabilities", {
+            "platforms": platforms or ["n8n", "make", "zapier"]
+        })
     
     async def get_translation_complexity(
         self,
@@ -172,124 +215,30 @@ class WorkflowTranslatorClient:
         target_platform: str
     ) -> Dict[str, Any]:
         """
-        Get difficulty and success rate for a translation path
+        Get complexity information for a translation path.
         
         Args:
             source_platform: Source platform
             target_platform: Target platform
             
         Returns:
-            Complexity information including difficulty and success rate
+            Complexity info including difficulty and success rate
         """
-        arguments = {
+        return await self._call_tool("get_translation_complexity", {
             "sourcePlatform": source_platform,
             "targetPlatform": target_platform
-        }
-        
-        return await self._call_tool("get_translation_complexity", arguments)
-    
-    async def suggest_best_platform(
-        self,
-        requirements: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """
-        Suggest the best platform based on requirements
-        
-        Args:
-            requirements: Dictionary with needs_custom_code, needs_loops,
-                         team_technical_level, budget_level, etc.
-            
-        Returns:
-            Platform recommendation with scores and reasoning
-        """
-        arguments = {
-            "requirements": requirements
-        }
-        
-        return await self._call_tool("suggest_best_platform", arguments)
-    
-    async def translate_expression(
-        self,
-        expression: str,
-        source_platform: str,
-        target_platform: str,
-        context: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
-        """
-        Translate a single expression between platform syntaxes
-        
-        Args:
-            expression: Expression to translate
-            source_platform: Source platform
-            target_platform: Target platform
-            context: Additional context (field types, available data)
-            
-        Returns:
-            Translated expression
-        """
-        arguments = {
-            "expression": expression,
-            "sourcePlatform": source_platform,
-            "targetPlatform": target_platform
-        }
-        
-        if context:
-            arguments["context"] = context
-        
-        return await self._call_tool("translate_expression", arguments)
-    
-    async def analyze_workflow_complexity(
-        self,
-        workflow: Dict[str, Any],
-        platform: str
-    ) -> Dict[str, Any]:
-        """
-        Analyze workflow complexity and get optimization suggestions
-        
-        Args:
-            workflow: Workflow to analyze
-            platform: Platform (n8n, make, zapier)
-            
-        Returns:
-            Complexity analysis with score and suggestions
-        """
-        arguments = {
-            "workflow": workflow,
-            "platform": platform
-        }
-        
-        return await self._call_tool("analyze_workflow_complexity", arguments)
-    
-    async def batch_translate_workflows(
-        self,
-        workflows: List[Dict[str, Any]],
-        source_platform: str,
-        target_platform: str,
-        optimize: bool = True
-    ) -> Dict[str, Any]:
-        """
-        Translate multiple workflows at once
-        
-        Args:
-            workflows: List of workflow JSONs
-            source_platform: Source platform
-            target_platform: Target platform
-            optimize: Apply optimizations
-            
-        Returns:
-            Batch translation results
-        """
-        arguments = {
-            "workflows": workflows,
-            "sourcePlatform": source_platform,
-            "targetPlatform": target_platform,
-            "optimize": optimize
-        }
-        
-        return await self._call_tool("batch_translate_workflows", arguments)
-    
-    async def close(self):
-        """Close the HTTP client"""
-        await self.client.aclose()
-        self._initialized = False
+        })
 
+
+# Global instance
+_translator_client: Optional[TranslatorClient] = None
+
+
+def get_translator_client() -> TranslatorClient:
+    """Get or create the global Translator client instance."""
+    global _translator_client
+    
+    if _translator_client is None:
+        _translator_client = TranslatorClient()
+    
+    return _translator_client

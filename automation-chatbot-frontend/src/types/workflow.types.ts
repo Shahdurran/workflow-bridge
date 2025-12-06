@@ -82,7 +82,9 @@ export interface Template {
 }
 
 // Platform-related types
-export type Platform = 'zapier' | 'make' | 'n8n';
+// Beta phase: Only Make and n8n supported
+// 'zapier' type kept for future use but disabled in UI
+export type Platform = 'make' | 'n8n' | 'zapier';
 
 export interface PlatformInfo {
   id: string;

@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 class WorkflowGenerationRequest(BaseModel):
     """Request model for workflow generation."""
     session_id: str = Field(..., description="Conversation session ID")
-    platform: str = Field(..., description="Target platform (n8n, make, zapier)")
+    platform: str = Field(..., description="Target platform (n8n, make) - Beta: zapier coming soon")
     requirements: Optional[Dict[str, Any]] = Field(None, description="Additional requirements")
     template_id: Optional[str] = Field(None, description="Base template to use")
 
@@ -128,7 +128,7 @@ async def generate_workflow(
         # TODO: Apply optimizations
         # TODO: Save generated workflow to database
         
-        # Placeholder workflow generation
+        # Beta phase: Only n8n and Make supported
         if request.platform == "n8n":
             workflow_json = await generator.generate_n8n_workflow(
                 session_id=request.session_id,
@@ -140,14 +140,15 @@ async def generate_workflow(
                 requirements=request.requirements
             )
         elif request.platform == "zapier":
-            workflow_json = await generator.generate_zapier_workflow(
-                session_id=request.session_id,
-                requirements=request.requirements
+            # Zapier support disabled for beta
+            raise HTTPException(
+                status_code=status.HTTP_501_NOT_IMPLEMENTED,
+                detail="Zapier support is coming soon. Currently in beta: Make and n8n only."
             )
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Invalid platform specified"
+                detail="Invalid platform specified. Supported: n8n, make"
             )
         
         # Validate generated workflow

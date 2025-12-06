@@ -5,8 +5,19 @@ export interface WorkflowNode {
   type: 'trigger' | 'action' | 'logic';
   app: string;
   action: string;
-  position: { x: number; y: number };
+  position: { x: number; y: number } | [number, number];
   data?: Record<string, any>;
+  // n8n-specific fields
+  parameters?: Record<string, any>;
+  credentials?: Record<string, any>;
+  typeVersion?: number;
+  nodeType?: string; // Full node type like "n8n-nodes-base.webhook"
+  disabled?: boolean;
+  notes?: string;
+  continueOnFail?: boolean;
+  retryOnFail?: boolean;
+  maxTries?: number;
+  waitBetweenTries?: number;
 }
 
 export interface WorkflowConnection {
@@ -58,4 +69,6 @@ export interface Template {
   complexity: 'Beginner' | 'Advanced';
 }
 
-export type Platform = 'zapier' | 'make' | 'n8n';
+// Beta phase: Only Make and n8n supported
+// 'zapier' type kept for future use but disabled in UI
+export type Platform = 'make' | 'n8n' | 'zapier';

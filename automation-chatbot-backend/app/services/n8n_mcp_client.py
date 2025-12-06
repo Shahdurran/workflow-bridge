@@ -282,10 +282,42 @@ class N8nMcpClient:
         Returns:
             Dict with validation results including errors and warnings
         """
-        return await self._call_tool("validate_workflow", {
-            "workflow": workflow,
-            "profile": profile
-        })
+        # Log workflow structure for debugging
+        logger.info(f"Validating workflow with keys: {list(workflow.keys())}")
+        
+        # Basic validation before calling MCP
+        if not isinstance(workflow, dict):
+            return {
+                "valid": False,
+                "errors": ["Workflow must be a dictionary/object"],
+                "warnings": []
+            }
+        
+        # Check for required n8n fields
+        if "nodes" not in workflow:
+            logger.warning("Workflow missing 'nodes' field")
+            return {
+                "valid": False,
+                "errors": ["Workflow must have a 'nodes' array"],
+                "warnings": []
+            }
+        
+        if "connections" not in workflow:
+            logger.warning("Workflow missing 'connections' field")
+            workflow["connections"] = {}  # Add empty connections if missing
+        
+        try:
+            return await self._call_tool("validate_workflow", {
+                "workflow": workflow,
+                "profile": profile
+            })
+        except Exception as e:
+            logger.error(f"MCP validation error: {str(e)}")
+            return {
+                "valid": False,
+                "errors": [f"Validation service error: {str(e)}"],
+                "warnings": []
+            }
     
     async def autofix_workflow(
         self,

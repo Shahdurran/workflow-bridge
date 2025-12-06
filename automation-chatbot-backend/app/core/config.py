@@ -73,6 +73,15 @@ class Settings(BaseSettings):
     n8n_api_url: Optional[str] = Field(default=None, env="N8N_API_URL")
     n8n_api_key: Optional[str] = Field(default=None, env="N8N_API_KEY")
     
+    # make-mcp Integration
+    make_mcp_url: Optional[str] = Field(default="http://localhost:3002", env="MAKE_MCP_URL")
+    make_mcp_auth_token: Optional[str] = Field(default=None, env="MAKE_MCP_AUTH_TOKEN")
+    make_api_url: Optional[str] = Field(default=None, env="MAKE_API_URL")
+    make_api_key: Optional[str] = Field(default=None, env="MAKE_API_KEY")
+    
+    # workflow-translator Integration
+    translator_mcp_url: Optional[str] = Field(default="http://localhost:3003", env="TRANSLATOR_MCP_URL")
+    
     # LangChain Configuration
     langchain_verbose: bool = Field(default=False, env="LANGCHAIN_VERBOSE")
     langchain_cache: bool = Field(default=True, env="LANGCHAIN_CACHE")

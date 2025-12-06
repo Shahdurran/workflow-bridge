@@ -18,7 +18,7 @@ from app.services.n8n_mcp_client import get_mcp_client
 logger = logging.getLogger(__name__)
 
 
-# System prompt optimized for visual workflow display
+# System prompts optimized for visual workflow display
 N8N_SYSTEM_PROMPT = """You are an n8n workflow assistant with tools to search nodes/templates, get node details, validate and deploy workflows.
 
 CRITICAL RESPONSE FORMAT:
@@ -60,6 +60,52 @@ Setup: Connect your Gmail and Google Sheets OAuth credentials in n8n.
 {
   "name": "Gmail to Sheets",
   "nodes": [...]
+}
+```
+"
+"""
+
+MAKE_SYSTEM_PROMPT = """You are a Make.com scenario assistant with tools to search modules/templates, get module details, validate and deploy scenarios.
+
+CRITICAL RESPONSE FORMAT:
+When you create a scenario, you MUST output the scenario JSON in this exact format at the end of your response:
+
+```json
+{
+  "name": "Scenario Name",
+  "flow": [...],
+  "metadata": {...}
+}
+```
+
+WORKFLOW PRESENTATION RULES:
+1. After building/finding a scenario, ALWAYS output the complete scenario JSON in a ```json code block
+2. Provide a brief explanation (2-3 sentences) about what the scenario does
+3. Include setup instructions if API keys are needed
+4. DO NOT ask if user wants to deploy or see JSON - the visual builder will handle that automatically
+5. DO NOT offer multiple options - present the scenario immediately
+
+PROCESS:
+1. Search templates first using search_templates
+2. If template found, use get_template to retrieve it
+3. If no template fits, build scenario using search_modules and get_module_info
+4. Validate the scenario using validate_scenario
+5. Output the scenario JSON immediately
+
+TOOL USAGE:
+- Always set includeExamples: true when searching modules
+- Use validate_scenario before presenting the scenario
+- Be concise and friendly
+
+Example Response:
+"I've created a Google Sheets to Slack scenario for you. It monitors a Google Sheet for new rows and sends a Slack notification with the row data.
+
+Setup: Connect your Google Sheets and Slack accounts in Make.com.
+
+```json
+{
+  "name": "Sheets to Slack",
+  "flow": [...]
 }
 ```
 "
@@ -498,6 +544,29 @@ class ClaudeService:
                 
                 if workflow:
                     logger.info(f"✅ Successfully extracted workflow with {len(workflow.get('nodes', []))} nodes")
+                    
+                    # Send workflow_clear event to reset canvas
+                    yield {
+                        "type": "workflow_clear",
+                        "content": {}
+                    }
+                    
+                    # Stream individual nodes for real-time visualization
+                    nodes = workflow.get('nodes', [])
+                    for index, node in enumerate(nodes):
+                        logger.info(f"📤 Streaming node {index + 1}/{len(nodes)}: {node.get('name')}")
+                        yield {
+                            "type": "workflow_node",
+                            "content": {
+                                "node": node,
+                                "index": index,
+                                "total": len(nodes)
+                            }
+                        }
+                        # Small delay for visual effect (optional)
+                        await asyncio.sleep(0.05)
+                    
+                    # Send complete workflow at the end
                     yield {
                         "type": "workflow",
                         "content": workflow

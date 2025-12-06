@@ -12,13 +12,14 @@ export default function PlatformSelector({
   onPlatformChange 
 }: PlatformSelectorProps) {
   const platforms = [
-    {
-      id: 'zapier' as Platform,
-      name: 'Zapier',
-      icon: Zap,
-      className: 'text-zapier hover:text-zapier',
-      activeClassName: 'bg-white text-zapier',
-    },
+    // NOTE: Zapier support temporarily disabled for beta phase
+    // {
+    //   id: 'zapier' as Platform,
+    //   name: 'Zapier',
+    //   icon: Zap,
+    //   className: 'text-zapier hover:text-zapier',
+    //   activeClassName: 'bg-white text-zapier',
+    // },
     {
       id: 'make' as Platform,
       name: 'Make',

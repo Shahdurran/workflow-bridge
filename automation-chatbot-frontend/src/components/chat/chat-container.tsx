@@ -18,12 +18,14 @@ interface Message {
 interface ChatContainerProps {
   onWorkflowUpdate: (node: WorkflowNode) => void;
   onConnectionUpdate: (connection: { source: string; target: string }) => void;
+  onClearWorkflow?: () => void;
   currentPlatform: Platform;
 }
 
 export default function ChatContainer({ 
   onWorkflowUpdate, 
-  onConnectionUpdate, 
+  onConnectionUpdate,
+  onClearWorkflow, 
   currentPlatform 
 }: ChatContainerProps) {
   const [messages, setMessages] = useState<Message[]>([
@@ -38,12 +40,18 @@ export default function ChatContainer({
   const [isThinking, setIsThinking] = useState(false);
   const [currentTool, setCurrentTool] = useState<string | null>(null);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [isGeneratingWorkflow, setIsGeneratingWorkflow] = useState(false);
+  const [workflowProgress, setWorkflowProgress] = useState({ current: 0, total: 0 });
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const accumulatedTextRef = useRef('');
   const currentMessageIdRef = useRef<string | null>(null);
+  const workflowNodesRef = useRef<any[]>([]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
   };
 
   useEffect(() => {
@@ -66,7 +74,12 @@ export default function ChatContainer({
     currentMessageIdRef.current = `assistant-${Date.now()}`;
 
     try {
-      await streamN8nChat(content, conversationId || undefined, (event) => {
+      // Route to appropriate endpoint based on platform
+      const streamFunction = currentPlatform === 'make' 
+        ? (await import('@/services/api')).streamMakeChat
+        : (await import('@/services/api')).streamN8nChat;
+      
+      await streamFunction(content, conversationId || undefined, async (event) => {
         const { event: eventType, data } = event;
 
         switch (eventType) {
@@ -111,6 +124,50 @@ export default function ChatContainer({
             setCurrentTool(null);
             break;
 
+          case 'workflow_clear':
+            // Clear existing workflow nodes when new workflow generation starts
+            console.log('🧹 Clearing canvas for new workflow');
+            setIsGeneratingWorkflow(true);
+            setWorkflowProgress({ current: 0, total: 0 });
+            workflowNodesRef.current = [];
+            
+            // Clear the canvas by calling parent's clear function
+            if (onClearWorkflow) {
+              onClearWorkflow();
+              console.log('✅ Canvas cleared');
+            }
+            break;
+
+          case 'workflow_node':
+            // Handle incremental node streaming
+            const nodeData = data.node;
+            const nodeIndex = data.index;
+            const nodeTotal = data.total;
+            
+            console.log(`📥 Received node ${nodeIndex + 1}/${nodeTotal}:`, nodeData.name);
+            setWorkflowProgress({ current: nodeIndex + 1, total: nodeTotal });
+            
+            // Store node for later connection building
+            workflowNodesRef.current.push(nodeData);
+            
+            // Transform and add node to canvas immediately
+            try {
+              const { transformN8nToCanvas } = await import('@/utils/workflow-transformer');
+              // Transform just this one node with temporary workflow structure
+              const tempWorkflow = {
+                name: 'Temp',
+                nodes: [nodeData],
+                connections: {}
+              };
+              const { nodes } = transformN8nToCanvas(tempWorkflow);
+              if (nodes.length > 0) {
+                onWorkflowUpdate(nodes[0]);
+              }
+            } catch (error) {
+              console.error('❌ Error transforming node:', error);
+            }
+            break;
+
           case 'workflow':
             // Update the current message with workflow
             setMessages(prev => {
@@ -125,57 +182,62 @@ export default function ChatContainer({
             });
             
             // Extract nodes and connections for the canvas
-            if (data.workflow && data.workflow.nodes) {
-              console.log('🔄 Transforming n8n workflow nodes for WorkflowCanvas');
-              
-              data.workflow.nodes.forEach((node: any, index: number) => {
-                // Transform n8n node structure to WorkflowCanvas format
-                // n8n node type is like "n8n-nodes-base.gmailTrigger"
-                const nodeTypeParts = node.type?.split('.') || [];
-                const nodeTypeShort = nodeTypeParts[nodeTypeParts.length - 1] || 'unknown';
-                
-                // Determine if it's a trigger or action (first node is usually trigger)
-                const isTrigger = index === 0 || nodeTypeShort.toLowerCase().includes('trigger');
-                
-                // Extract app name from node type
-                const appName = nodeTypeShort
-                  .replace(/Trigger$/i, '')
-                  .replace(/([A-Z])/g, '-$1')
-                  .toLowerCase()
-                  .replace(/^-/, '');
-                
-                const workflowNode: WorkflowNode = {
-                  id: node.id || `node-${index}`,
-                  type: isTrigger ? 'trigger' : 'action',
-                  app: appName,
-                  action: node.name || `Node ${index + 1}`,
-                  platform: currentPlatform,
-                  position: node.position 
-                    ? { x: node.position[0], y: node.position[1] }
-                    : { x: 100 + index * 300, y: 100 }
-                };
-                
-                console.log('🔄 Transformed node:', nodeTypeShort, '→', workflowNode);
-                onWorkflowUpdate(workflowNode);
+            if (data.workflow) {
+              console.log('🔄 Transforming workflow for canvas:', {
+                platform: data.platform || currentPlatform,
+                hasNodes: !!data.workflow.nodes,
+                hasFlow: !!data.workflow.flow,
+                hasSteps: !!data.workflow.steps,
+                workflow: data.workflow
               });
               
-              // Create connections between sequential nodes
-              if (data.workflow.connections) {
-                Object.entries(data.workflow.connections).forEach(([sourceNodeName, outputs]: [string, any]) => {
-                  Object.values(outputs).forEach((connections: any) => {
-                    connections.forEach((conn: any) => {
-                      // Find node IDs by name
-                      const sourceNode = data.workflow.nodes.find((n: any) => n.name === sourceNodeName);
-                      const targetNode = data.workflow.nodes.find((n: any) => n.name === conn.node);
-                      
-                      if (sourceNode && targetNode) {
-                        onConnectionUpdate({
-                          source: sourceNode.id,
-                          target: targetNode.id
-                        });
-                      }
-                    });
+              try {
+                // Use the universal transformer with auto-detection
+                const transformer = await import('@/utils/workflow-transformer');
+                const platform = data.platform || currentPlatform;
+                
+                // Let transformToCanvas auto-detect the format
+                const transformedData = transformer.transformToCanvas(data.workflow, platform);
+                
+                const { nodes, connections } = transformedData;
+                
+                console.log('✅ Transformed workflow:', {
+                  nodes: nodes.length,
+                  connections: connections.length,
+                  nodesList: nodes.map(n => ({ id: n.id, app: n.app, action: n.action }))
+                });
+                
+                // Only update if we got valid nodes
+                if (nodes.length > 0) {
+                  // Update canvas with transformed nodes
+                  nodes.forEach(node => {
+                    onWorkflowUpdate(node);
                   });
+                  
+                  // Update canvas with connections
+                  connections.forEach(connection => {
+                    onConnectionUpdate(connection);
+                  });
+                } else {
+                  console.warn('⚠️ No nodes transformed from workflow');
+                }
+              } catch (error) {
+                console.error('❌ Error transforming workflow:', error);
+                // Fallback to original nodes if transformation fails
+                data.workflow.nodes.forEach((node: any, index: number) => {
+                  const workflowNode: WorkflowNode = {
+                    id: node.id || `node-${index}`,
+                    type: index === 0 ? 'trigger' : 'action',
+                    app: node.type?.split('.').pop() || 'unknown',
+                    action: node.name || `Node ${index + 1}`,
+                    position: Array.isArray(node.position) 
+                      ? { x: node.position[0], y: node.position[1] }
+                      : node.position || { x: 100 + index * 300, y: 100 },
+                    parameters: node.parameters,
+                    nodeType: node.type,
+                    typeVersion: node.typeVersion,
+                  };
+                  onWorkflowUpdate(workflowNode);
                 });
               }
             }
@@ -185,6 +247,9 @@ export default function ChatContainer({
             setIsTyping(false);
             setIsThinking(false);
             setCurrentTool(null);
+            setIsGeneratingWorkflow(false);
+            setWorkflowProgress({ current: 0, total: 0 });
+            workflowNodesRef.current = [];
             break;
 
           case 'error':
@@ -239,7 +304,11 @@ export default function ChatContainer({
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4" data-testid="chat-messages">
+      <div 
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto p-4 space-y-4" 
+        data-testid="chat-messages"
+      >
         {messages.map((message) => (
           <MessageBubble key={message.id} message={message} />
         ))}
@@ -259,6 +328,32 @@ export default function ChatContainer({
               <div className="flex items-center gap-2 text-blue-800">
                 <Wrench className="h-4 w-4 animate-pulse" />
                 <span className="text-sm font-medium">{currentTool}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Workflow Generation Indicator */}
+        {isGeneratingWorkflow && workflowProgress.total > 0 && (
+          <div className="flex items-start space-x-3">
+            <div className="w-8 h-8 bg-workflow-blue rounded-full flex items-center justify-center flex-shrink-0">
+              <Bot className="text-white" size={16} />
+            </div>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg rounded-tl-none p-3 min-w-[200px]">
+              <div className="flex items-center gap-2 text-blue-800 mb-2">
+                <Wrench className="h-4 w-4 animate-pulse" />
+                <span className="text-sm font-medium">Building workflow...</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 bg-blue-200 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="bg-workflow-blue h-full transition-all duration-300"
+                    style={{ width: `${(workflowProgress.current / workflowProgress.total) * 100}%` }}
+                  />
+                </div>
+                <span className="text-xs text-blue-600 font-mono">
+                  {workflowProgress.current}/{workflowProgress.total}
+                </span>
               </div>
             </div>
           </div>

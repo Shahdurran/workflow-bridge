@@ -162,10 +162,34 @@ export const streamN8nChat = async (
   conversationId?: string,
   onEvent?: (event: StreamEvent) => void
 ): Promise<void> => {
+  return streamChat('/api/n8n/chat', message, conversationId, onEvent);
+};
+
+/**
+ * Stream chat messages from Claude AI with make-mcp integration.
+ * Uses Server-Sent Events (SSE) for real-time streaming.
+ */
+export const streamMakeChat = async (
+  message: string,
+  conversationId?: string,
+  onEvent?: (event: StreamEvent) => void
+): Promise<void> => {
+  return streamChat('/api/make/chat', message, conversationId, onEvent);
+};
+
+/**
+ * Generic stream chat function for platform-specific endpoints.
+ */
+const streamChat = async (
+  endpoint: string,
+  message: string,
+  conversationId?: string,
+  onEvent?: (event: StreamEvent) => void
+): Promise<void> => {
   const { data: { session } } = await supabase.auth.getSession();
   const token = session?.access_token;
 
-  const url = `${API_BASE_URL}/api/n8n/chat`;
+  const url = `${API_BASE_URL}${endpoint}`;
   
   const response = await fetch(url, {
     method: 'POST',
@@ -279,6 +303,67 @@ export const getN8nConversation = async (conversationId: string) => {
  */
 export const deleteN8nConversation = async (conversationId: string) => {
   await apiClient.delete(`/api/n8n/conversations/${conversationId}`);
+};
+
+// ============================================================================
+// Translation API
+// ============================================================================
+
+/**
+ * Translate a workflow from one platform to another.
+ */
+export const translateWorkflow = async (
+  workflow: any,
+  sourcePlatform: string,
+  targetPlatform: string,
+  optimize: boolean = true
+) => {
+  const response = await apiClient.post('/api/translate/workflow', {
+    workflow,
+    source_platform: sourcePlatform,
+    target_platform: targetPlatform,
+    optimize,
+    preserve_names: false,
+    strict_mode: false,
+    validate_result: false
+  });
+  return response.data;
+};
+
+/**
+ * Translate a workflow to all supported platforms.
+ */
+export const translateWorkflowToAll = async (
+  workflow: any,
+  sourcePlatform: string
+) => {
+  const platforms = ['n8n', 'make', 'zapier'].filter(p => p !== sourcePlatform);
+  const translations = await Promise.all(
+    platforms.map(target => 
+      translateWorkflow(workflow, sourcePlatform, target)
+    )
+  );
+  
+  return {
+    [platforms[0]]: translations[0],
+    [platforms[1]]: translations[1]
+  };
+};
+
+/**
+ * Check if a workflow translation is feasible.
+ */
+export const checkTranslationFeasibility = async (
+  workflow: any,
+  sourcePlatform: string,
+  targetPlatform: string
+) => {
+  const response = await apiClient.post('/api/translate/feasibility', {
+    workflow,
+    source_platform: sourcePlatform,
+    target_platform: targetPlatform
+  });
+  return response.data;
 };
 
 // Auth API

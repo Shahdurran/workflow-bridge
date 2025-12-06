@@ -1,11 +1,11 @@
 @echo off
 REM Workflow Bridge Complete Startup Script for Windows
-REM This script starts Backend, Frontend, and n8n MCP
+REM This script starts Backend, Frontend, n8n MCP, and Make MCP
 
 echo.
-echo ========================================
-echo   Starting Workflow Bridge - Full Stack
-echo ========================================
+echo ================================================
+echo   Starting Workflow Bridge - Complete Stack
+echo ================================================
 echo.
 
 REM Check if backend directory exists
@@ -23,17 +23,26 @@ if not exist "automation-chatbot-frontend" (
 )
 
 REM Check if n8n-mcp directory exists
-if not exist "D:\workflow bridge\n8n-mcp" (
-    echo WARNING: n8n-mcp directory not found at D:\workflow bridge\n8n-mcp
+if not exist "n8n-mcp" (
+    echo WARNING: n8n-mcp directory not found
     echo Will skip n8n MCP startup
     set SKIP_N8N=1
 ) else (
     set SKIP_N8N=0
 )
 
-echo ========================================
-echo [1/3] Starting Backend (FastAPI)...
-echo ========================================
+REM Check if make-mcp directory exists
+if not exist "make-mcp" (
+    echo WARNING: make-mcp directory not found
+    echo Will skip Make MCP startup
+    set SKIP_MAKE=1
+) else (
+    set SKIP_MAKE=0
+)
+
+echo ================================================
+echo [1/4] Starting Backend (FastAPI)...
+echo ================================================
 echo.
 cd automation-chatbot-backend
 
@@ -65,16 +74,17 @@ if errorlevel 1 (
     exit /b 1
 )
 
+set "BACKEND_DIR=%CD%"
 echo Starting backend on http://localhost:8000
-start "Workflow Bridge Backend" cmd /k "cd /d "%~dp0automation-chatbot-backend" && venv\Scripts\activate && uvicorn app.main:app --reload --port 8000"
+start "Workflow Bridge Backend" cmd /k "cd /d "%BACKEND_DIR%" & venv\Scripts\activate & uvicorn app.main:app --reload --port 8000"
 
 cd ..
 timeout /t 3 /nobreak > nul
 
 echo.
-echo ========================================
-echo [2/3] Starting Frontend (Vite + React)...
-echo ========================================
+echo ================================================
+echo [2/4] Starting Frontend (Vite + React)...
+echo ================================================
 echo.
 cd automation-chatbot-frontend
 
@@ -90,8 +100,9 @@ if not exist "node_modules" (
     )
 )
 
+set "FRONTEND_DIR=%CD%"
 echo Starting frontend on http://localhost:5173
-start "Workflow Bridge Frontend" cmd /k "cd /d "%~dp0automation-chatbot-frontend" && npm run dev"
+start "Workflow Bridge Frontend" cmd /k "cd /d "%FRONTEND_DIR%" & npm run dev"
 
 cd ..
 timeout /t 3 /nobreak > nul
@@ -99,30 +110,59 @@ timeout /t 3 /nobreak > nul
 REM Start n8n MCP if directory exists
 if "%SKIP_N8N%"=="0" (
     echo.
-    echo ========================================
-    echo [3/3] Starting n8n MCP (HTTP Mode)...
-    echo ========================================
+    echo ================================================
+    echo [3/4] Starting n8n MCP (HTTP Mode)...
+    echo ================================================
     echo.
     
     REM Check if n8n-mcp is built
-    if not exist "D:\workflow bridge\n8n-mcp\dist" (
+    if not exist "n8n-mcp\dist" (
         echo WARNING: n8n-mcp dist folder not found!
-        echo Please build n8n-mcp first: cd n8n-mcp && npm run build
+        echo Please build n8n-mcp first: cd n8n-mcp ^&^& npm run build
         set SKIP_N8N=1
     ) else (
+        cd n8n-mcp
+        set "N8N_DIR=%CD%"
         echo Starting n8n MCP on http://localhost:3001
-        start "n8n MCP Server" cmd /k "cd /d "D:\workflow bridge\n8n-mcp" && set MCP_MODE=http && set PORT=3001 && set USE_FIXED_HTTP=true && set AUTH_TOKEN=aB3dE7fG9hJ2kL4mN6pQ8rS0tU5vW1xY && node dist/mcp/index.js"
+        start "n8n MCP Server" cmd /k "cd /d "%N8N_DIR%" & set MCP_MODE=http & set PORT=3001 & set USE_FIXED_HTTP=true & set AUTH_TOKEN=aB3dE7fG9hJ2kL4mN6pQ8rS0tU5vW1xY & node dist/mcp/index.js"
+        cd ..
         timeout /t 3 /nobreak > nul
     )
 ) else (
     echo.
-    echo [3/3] Skipping n8n MCP (not found)
+    echo [3/4] Skipping n8n MCP (not found)
+)
+
+REM Start Make MCP if directory exists
+if "%SKIP_MAKE%"=="0" (
+    echo.
+    echo ================================================
+    echo [4/4] Starting Make MCP (HTTP Mode)...
+    echo ================================================
+    echo.
+    
+    REM Check if make-mcp is built
+    if not exist "make-mcp\dist" (
+        echo WARNING: make-mcp dist folder not found!
+        echo Please build make-mcp first: cd make-mcp ^&^& npm run build
+        set SKIP_MAKE=1
+    ) else (
+        cd make-mcp
+        set "MAKE_DIR=%CD%"
+        echo Starting Make MCP on http://localhost:3002
+        start "Make MCP Server" cmd /k "cd /d "%MAKE_DIR%" & set MCP_MODE=http & set PORT=3002 & set AUTH_TOKEN=aB3dE7fG9hJ2kL4mN6pQ8rS0tU5vW1xY & node dist/index.js"
+        cd ..
+        timeout /t 3 /nobreak > nul
+    )
+) else (
+    echo.
+    echo [4/4] Skipping Make MCP (not found)
 )
 
 echo.
-echo ========================================
+echo ================================================
 echo   All Services Started Successfully!
-echo ========================================
+echo ================================================
 echo.
 echo Services running:
 echo   Backend:   http://localhost:8000
@@ -132,12 +172,18 @@ echo   Test Page: http://localhost:5173/test
 if "%SKIP_N8N%"=="0" (
     echo   n8n MCP:   http://localhost:3001
 )
+if "%SKIP_MAKE%"=="0" (
+    echo   Make MCP:  http://localhost:3002
+)
 echo.
-echo Three new terminal windows have opened:
+echo Terminal windows opened:
 echo   1. Backend (FastAPI on port 8000)
 echo   2. Frontend (Vite on port 5173)
 if "%SKIP_N8N%"=="0" (
     echo   3. n8n MCP (HTTP server on port 3001)
+)
+if "%SKIP_MAKE%"=="0" (
+    echo   4. Make MCP (HTTP server on port 3002)
 )
 echo.
 echo Close those windows to stop the servers.
@@ -149,11 +195,13 @@ REM Open application in default browser
 start http://localhost:5173
 
 echo.
-echo ========================================
+echo ================================================
 echo   Ready to use! 
-echo ========================================
+echo ================================================
+echo.
+echo To stop all services, run: STOP_ALL.bat
+echo To check service status, run: CHECK_SERVICES.ps1
 echo.
 echo Press any key to exit this window...
 echo (The services will continue running in their own windows)
 pause > nul
-
